@@ -1,0 +1,22 @@
+{
+  "elements": [
+    {
+      "image": "background.png",
+      // type: pixels / percentage
+      "type": "pixels",
+      "x": 0,
+      "y": 0
+    }
+  ],
+  "progress_bar": {
+    "enabled": true,
+    "type": "pixels",
+    "x": 0,
+    "y": 0
+  },
+  "mojang_logo": {
+    "type": "pixels",
+    "x": 0,
+    "y": 0
+  }
+}
