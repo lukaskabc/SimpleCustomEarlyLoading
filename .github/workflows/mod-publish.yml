@@ -61,7 +61,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-prerelease: false
           # A glob determining the primary files to upload.
-          files-primary: build/libs/stargate_early_loading-*.jar
+          files-primary: build/libs/SimpleCustomEarlyLoading-*.jar
           # The version type - alpha, beta, or release.
           version-type: release
           # An array of supported mod loaders.
