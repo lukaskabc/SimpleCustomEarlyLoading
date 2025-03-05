@@ -13,7 +13,6 @@ import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleFont;
 import net.neoforged.fml.loading.FMLConfig;
 import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
-import org.joml.Vector2f;
 
 import javax.swing.*;
 import java.lang.reflect.Method;
@@ -31,16 +30,16 @@ import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 
 public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
-    public static final String WINDOW_PROVIDER = "SimpleCustomEarlyLoadingWindow";
-    private static Vector2f center = new Vector2f(1, 1);
+    public static final String WINDOW_PROVIDER = "SimpleCustomEarlyLoading";
     private final RefDisplayWindow accessor;
     private final Config configuration;
 
     public SimpleCustomEarlyLoadingWindow() {
         this.accessor = new RefDisplayWindow(this);
+        checkFMLConfig();
         ConfigLoader.copyDefaultConfig();
         configuration = ConfigLoader.loadConfiguration();
-        checkFMLConfig();
+
     }
 
     /**
@@ -52,27 +51,36 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
     private static void checkFMLConfig() {
         final String windowProvider = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
         if (!WINDOW_PROVIDER.equals(windowProvider)) {
-            // TODO maybe update the config?
-//            FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, WINDOW_PROVIDER);
-            // question is how much reliable this is
-            JOptionPane.showMessageDialog(null, """
-                    You have installed the Simple Custom Early Loading mod,
-                    but the early window provider is not set to WINDOW_PROVIDER in the fml.toml config!
-                    Please update the config and restart the game.
-                    See mod description for instructions.
-                    https://github.com/lukaskabc/SimpleCustomEarlyLoading
-                    """.replace("WINDOW_PROVIDER", WINDOW_PROVIDER));
-        }
-    }
+            // Create a parent frame that will appear in the taskbar
+            final JFrame frame = new JFrame("Missing NeoForge configuration");
+            frame.setAlwaysOnTop(true);
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.setLocationRelativeTo(null); // Center on screen
+            frame.setVisible(true);
 
-    /**
-     * Sets the center position of the frame buffer based on provided coordinates.
-     *
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
-     */
-    public static void setCenter(final int x, final int y) {
-        center.set(x, y);
+            // question is how much reliable this is
+            final int answer = JOptionPane.showConfirmDialog(frame, """
+                            You have installed the Simple Custom Early Loading mod,
+                            but the early window provider is not set to WINDOW_PROVIDER in the fml.toml config!
+                            Please update the config and restart the game.
+                            See mod description for instructions.
+                            https://github.com/lukaskabc/SimpleCustomEarlyLoading
+                            
+                            Do you wish to update the config?
+                            Answering yes will update the config and exit the game.
+                            """.replace("WINDOW_PROVIDER", WINDOW_PROVIDER),
+                    "Missing NeoForge configuration",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            frame.dispose();
+
+            if (answer == JOptionPane.YES_OPTION) {
+                FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, WINDOW_PROVIDER);
+                System.exit(0);
+            }
+        }
     }
 
     /**
@@ -92,7 +100,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         });
 
         Optional.ofNullable(configuration.getProgressBar()).ifPresent(bar -> {
-            elements.add(new StartupProgressBar(font, ));
+            elements.add(new StartupProgressBar(font, ElementType.ABSOLUTE.equals(bar.getType()), bar.getCoords()).get());
         });
 
         // from forge early loading:
@@ -246,7 +254,6 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         );
         accessor.setContext(context);
         accessor.setFrameBuffer(RefEarlyFrameBuffer.constructor(context));
-        setCenter(context.scaledWidth() / 2, context.scaledHeight() / 2);
         RefEarlyFrameBuffer.close(oldFrameBuffer);
     }
 }

@@ -76,6 +76,6 @@ public class ProgressBar {
     }
 
     public interface BarPosition {
-        int[] location(RenderElement.DisplayContext context);
+        float[] location(RenderElement.DisplayContext context);
     }
 }

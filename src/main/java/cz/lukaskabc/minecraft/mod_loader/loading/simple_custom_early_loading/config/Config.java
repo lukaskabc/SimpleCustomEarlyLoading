@@ -8,7 +8,7 @@ import java.util.List;
 @NullUnmarked
 public class Config {
     private List<Element> elements = new ArrayList<>(0);
-    private Element progressBar = null;
+    private ProgressBarConfig progressBar = null;
     private boolean performanceBar = true;
     private boolean fox = true;
     private boolean logMessages = true;
@@ -22,11 +22,11 @@ public class Config {
         this.elements = elements;
     }
 
-    public Element getProgressBar() {
+    public ProgressBarConfig getProgressBar() {
         return progressBar;
     }
 
-    public void setProgressBar(Element progressBar) {
+    public void setProgressBar(ProgressBarConfig progressBar) {
         this.progressBar = progressBar;
     }
 

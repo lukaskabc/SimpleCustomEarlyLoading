@@ -23,14 +23,25 @@ public class RenderableElement implements Supplier<RenderElement> {
 
     private final String texture;
     private final int textureId;
-    private boolean absolute = true;
-    private float[] coords;
+    private final boolean absolute;
+    private final float[] coords;
 
     public RenderableElement(String texture, boolean absolute, float[] coords) {
         this.texture = texture;
         this.textureId = TEXTURE_ID++;
         this.coords = coords;
         this.absolute = absolute;
+    }
+
+    public static float[] relativeCoords(float[] coords, CSB csb) {
+        final float width = csb.ctx().scaledWidth() / 100f;
+        final float height = csb.ctx().scaledHeight() / 100f;
+        return new float[]{
+                coords[0] * width,
+                coords[1] * width,
+                coords[2] * height,
+                coords[3] * height
+        };
     }
 
     /**
@@ -42,7 +53,7 @@ public class RenderableElement implements Supplier<RenderElement> {
     @Override
     public RenderElement get() {
         try {
-            STBHelper.resolveAndBindTexture(texture, DEFAULT_TEXTURE_SIZE, GL_TEXTURE0 + TEXTURE_ID + INDEX_TEXTURE_OFFSET);
+            STBHelper.resolveAndBindTexture(texture, DEFAULT_TEXTURE_SIZE, GL_TEXTURE0 + textureId + INDEX_TEXTURE_OFFSET);
         } catch (FileNotFoundException e) {
             Log.error("Failed to load texture: ", e.getMessage());
             throw new ConfigurationException(e);
@@ -57,6 +68,7 @@ public class RenderableElement implements Supplier<RenderElement> {
      * @param frame the current frame number.
      */
     private void render(CSB csb, int frame) {
+        final float[] coords = absolute ? this.coords : relativeCoords(this.coords, csb);
         csb.ctx().elementShader().updateTextureUniform(textureId + INDEX_TEXTURE_OFFSET);
         csb.ctx().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
         csb.buffer().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
