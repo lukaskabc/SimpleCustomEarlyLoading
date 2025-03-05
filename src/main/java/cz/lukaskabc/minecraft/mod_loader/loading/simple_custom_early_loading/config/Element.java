@@ -3,8 +3,10 @@ package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.co
 public class Element {
     private String image = null;
     private ElementType type = ElementType.ABSOLUTE;
-    private double x = 0;
-    private double y = 0;
+    private float x1;
+    private float x2;
+    private float y1;
+    private float y2;
 
     public String getImage() {
         return image;
@@ -22,19 +24,39 @@ public class Element {
         this.type = type;
     }
 
-    public double getX() {
-        return x;
+    public float getX1() {
+        return x1;
     }
 
-    public void setX(double x) {
-        this.x = x;
+    public void setX1(float x1) {
+        this.x1 = x1;
     }
 
-    public double getY() {
-        return y;
+    public float getX2() {
+        return x2;
     }
 
-    public void setY(double y) {
-        this.y = y;
+    public void setX2(float x2) {
+        this.x2 = x2;
+    }
+
+    public float getY1() {
+        return y1;
+    }
+
+    public void setY1(float y1) {
+        this.y1 = y1;
+    }
+
+    public float getY2() {
+        return y2;
+    }
+
+    public void setY2(float y2) {
+        this.y2 = y2;
+    }
+
+    public float[] getCoords() {
+        return new float[]{x1, x2, y1, y2};
     }
 }

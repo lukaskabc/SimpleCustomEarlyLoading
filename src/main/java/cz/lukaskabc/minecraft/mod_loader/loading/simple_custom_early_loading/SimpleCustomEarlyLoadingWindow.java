@@ -2,6 +2,9 @@ package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.Config;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigLoader;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ElementType;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.RenderableElement;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StartupProgressBar;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefEarlyFrameBuffer;
 import net.neoforged.fml.earlydisplay.ColourScheme;
@@ -35,6 +38,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
 
     public SimpleCustomEarlyLoadingWindow() {
         this.accessor = new RefDisplayWindow(this);
+        ConfigLoader.copyDefaultConfig();
         configuration = ConfigLoader.loadConfiguration();
         checkFMLConfig();
     }
@@ -49,6 +53,8 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         final String windowProvider = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
         if (!WINDOW_PROVIDER.equals(windowProvider)) {
             // TODO maybe update the config?
+//            FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, WINDOW_PROVIDER);
+            // question is how much reliable this is
             JOptionPane.showMessageDialog(null, """
                     You have installed the Simple Custom Early Loading mod,
                     but the early window provider is not set to WINDOW_PROVIDER in the fml.toml config!
@@ -80,13 +86,13 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         final SimpleFont font = accessor.getFont();
 
         Optional.ofNullable(configuration.getElements()).ifPresent(list -> {
-            list.forEach(element -> {
-                // TODO: create render element
+            list.forEach(el -> {
+                elements.add(new RenderableElement(el.getImage(), ElementType.ABSOLUTE.equals(el.getType()), el.getCoords()).get());
             });
         });
 
         Optional.ofNullable(configuration.getProgressBar()).ifPresent(bar -> {
-            // TODO
+            elements.add(new StartupProgressBar(font, ));
         });
 
         // from forge early loading:

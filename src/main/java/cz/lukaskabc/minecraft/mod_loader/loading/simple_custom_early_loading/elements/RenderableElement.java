@@ -1,5 +1,6 @@
-package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading;
+package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements;
 
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.STBHelper;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigurationException;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.CSB;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefRenderElement;
@@ -22,10 +23,14 @@ public class RenderableElement implements Supplier<RenderElement> {
 
     private final String texture;
     private final int textureId;
+    private boolean absolute = true;
+    private float[] coords;
 
-    public RenderableElement(String texture) {
+    public RenderableElement(String texture, boolean absolute, float[] coords) {
         this.texture = texture;
         this.textureId = TEXTURE_ID++;
+        this.coords = coords;
+        this.absolute = absolute;
     }
 
     /**
@@ -55,7 +60,7 @@ public class RenderableElement implements Supplier<RenderElement> {
         csb.ctx().elementShader().updateTextureUniform(textureId + INDEX_TEXTURE_OFFSET);
         csb.ctx().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
         csb.buffer().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
-        QuadHelper.loadQuad(csb.buffer(), 0f, csb.ctx().scaledWidth(), 0f, csb.ctx().scaledHeight(), 0f, 1f, 0f, 1f, COLOR);
+        QuadHelper.loadQuad(csb.buffer(), coords[0], coords[1], coords[2], coords[3], 0f, 1f, 0f, 1f, COLOR);
         csb.buffer().draw();
     }
 

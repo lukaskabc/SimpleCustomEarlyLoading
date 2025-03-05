@@ -4,13 +4,16 @@
       "image": "background.png",
       // type: absolute / percentage
       "type": "absolute",
-      "x": 0,
-      "y": 0
+      "x1": 0,
+      "x2": 0,
+      "y1": 0,
+      "y2": 0
     }
   ],
   // "progress_bar": null to remove the default element
   "progress_bar": {
     "type": "absolute",
+    // The coords of the bar center
     "x": 0,
     "y": 0
   },
