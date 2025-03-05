@@ -1,17 +1,19 @@
 # Simple Custom Early Loading
 
-This _mod_ allows to customize the Neoforge's early loading screen.
+<a href="https://www.curseforge.com/minecraft/mc-mods/simple-custom-early-loading" target="_blank"><img src="https://img.shields.io/curseforge/dt/1214077?style=for-the-badge&logo=curseforge&color=626e7b" alt="Curseforge"></a>
+
+This _mod_ allows the customization of Neoforge's early loading screen.
 
 ![Preview](./preview.png)
 
 Only static images are supported.  
-Currently the window is not able to dynamically change its resolution when the window is resized.  
+Currently, the window is not able to dynamically change its resolution when the window is resized.  
 I won't allow removing the Mojang logo.
 
 ## Features:
 
 - add and position **custom images** (png)
-- toggle and change position of the progress bar
+- toggle and change the position of the progress bar
 - toggle performance bar
 - toggle NeoForge's fox
 - toggle bottom left log
