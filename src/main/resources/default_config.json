@@ -2,21 +2,20 @@
   "elements": [
     {
       "image": "background.png",
-      // type: pixels / percentage
-      "type": "pixels",
+      // type: absolute / percentage
+      "type": "absolute",
       "x": 0,
       "y": 0
     }
   ],
+  // "progress_bar": null to remove the default element
   "progress_bar": {
-    "enabled": true,
-    "type": "pixels",
+    "type": "absolute",
     "x": 0,
     "y": 0
   },
-  "mojang_logo": {
-    "type": "pixels",
-    "x": 0,
-    "y": 0
-  }
+  "performance_bar": true,
+  "fox": true,
+  "log_messages": true,
+  "forge_version": true
 }

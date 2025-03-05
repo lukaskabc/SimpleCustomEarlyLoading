@@ -2,7 +2,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.co
 
 public class Element {
     private String image = null;
-    private ElementType type = ElementType.PIXELS;
+    private ElementType type = ElementType.ABSOLUTE;
     private double x = 0;
     private double y = 0;
 
