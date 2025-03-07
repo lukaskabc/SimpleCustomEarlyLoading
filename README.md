@@ -1,6 +1,7 @@
 # Simple Custom Early Loading
 
 <a href="https://www.curseforge.com/minecraft/mc-mods/simple-custom-early-loading" target="_blank"><img src="https://img.shields.io/curseforge/dt/1214077?style=for-the-badge&logo=curseforge&color=626e7b" alt="Curseforge"></a>
+<a href="https://modrinth.com/mod/simple-custom-early-loading" target="_blank"><img src="https://img.shields.io/modrinth/dt/simple-custom-early-loading?style=for-the-badge&logo=modrinth&color=626e7b" alt="Modrinth"></a>
 
 This _mod_ allows the customization of Neoforge's early loading screen.
 
