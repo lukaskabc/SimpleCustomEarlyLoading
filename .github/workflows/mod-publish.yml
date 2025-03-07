@@ -7,13 +7,23 @@ on:
   release:
     types: [ published ]
 
+env:
+  JAVA_VERSION: 21
+  MOD_LOADERS: neoforge
+  GAME_VERSIONS: |
+    [1.21,1.21.4]
+  GAME_VERSION_FILTER: releases
+  VERSION_TYPE: release
+  PRIMARY_FILE_GLOB: build/libs/SimpleCustomEarlyLoading-*.jar
+
 jobs:
-  publish-to-curseforge:
+  build:
     runs-on: ubuntu-latest
     environment: github-actions
     permissions:
       contents: write
-      pull-requests: read
+    outputs:
+      tag_version: ${{ env.TAG }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -22,7 +32,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: 21
+          java-version: ${{ env.JAVA_VERSION }}
 
       - name: Setup Gradle Caches
         uses: actions/cache@v3
@@ -50,26 +60,84 @@ jobs:
       - name: Build Release
         run: ./gradlew build
 
-      - name: Publish to Curseforge
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: ${{ env.PRIMARY_FILE_GLOB }}
+
+  publish-to-github:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: github-actions
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: artifacts
+
+      - name: Publish to GitHub
         uses: Kir-Antipov/mc-publish@v3.3
         with:
-          # The unique identifier of your CurseForge project.
-          curseforge-id: 1214077
-          # Your CurseForge API token.
-          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          # Your GitHub API token.
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-prerelease: false
-          # A glob determining the primary files to upload.
-          files-primary: build/libs/SimpleCustomEarlyLoading-*.jar
-          # The version type - alpha, beta, or release.
-          version-type: release
-          # An array of supported mod loaders.
-          loaders: neoforge
-          # An array of supported Minecraft versions.
-          game-versions: |
-            [1.21,1.21.4]
-          game-version-filter: none
-          # An array of Java versions compatible with your project.
-          java: |
-            21
+          files-primary: artifacts/${{ env.PRIMARY_FILE_GLOB }}
+          version-type: ${{ env.VERSION_TYPE }}
+          loaders: ${{ env.MOD_LOADERS }}
+          game-versions: ${{ env.GAME_VERSIONS }}
+          game-version-filter: ${{ env.GAME_VERSION_FILTER }}
+          java: ${{ env.JAVA_VERSION }}
+
+  publish-to-curseforge:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: github-actions
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: artifacts
+
+      - name: Publish to CurseForge
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          curseforge-id: 1214077
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          files-primary: artifacts/${{ env.PRIMARY_FILE_GLOB }}
+          version-type: ${{ env.VERSION_TYPE }}
+          loaders: ${{ env.MOD_LOADERS }}
+          game-versions: ${{ env.GAME_VERSIONS }}
+          game-version-filter: ${{ env.GAME_VERSION_FILTER }}
+          java: ${{ env.JAVA_VERSION }}
+
+  publish-to-modrinth:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: github-actions
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: artifacts
+
+      - name: Publish to Modrinth
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: Bi8o4aLw
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          files-primary: artifacts/${{ env.PRIMARY_FILE_GLOB }}
+          version-type: ${{ env.VERSION_TYPE }}
+          loaders: ${{ env.MOD_LOADERS }}
+          game-versions: ${{ env.GAME_VERSIONS }}
+          game-version-filter: ${{ env.GAME_VERSION_FILTER }}
+          java: ${{ env.JAVA_VERSION }}
