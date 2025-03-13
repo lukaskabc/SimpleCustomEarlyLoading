@@ -4,7 +4,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.el
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.CSB;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefSimpleFont;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.TextureRenderer;
-import net.neoforged.fml.earlydisplay.*;
+import net.minecraftforge.fml.earlydisplay.*;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefRenderElement.getGlobalAlpha;
 

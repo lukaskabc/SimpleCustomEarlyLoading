@@ -1,11 +1,12 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection;
 
-import net.neoforged.fml.earlydisplay.PerformanceInfo;
+import net.minecraftforge.fml.earlydisplay.PerformanceInfo;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.ReflectionAccessor.*;
+import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.ReflectionAccessor.findField;
+import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.ReflectionAccessor.privateLookup;
 
 public class RefPerformanceInfo {
     private static final MethodHandles.Lookup lookup = privateLookup(PerformanceInfo.class);

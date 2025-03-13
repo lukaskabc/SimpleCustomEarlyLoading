@@ -7,12 +7,13 @@ import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.ele
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StartupProgressBar;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefEarlyFrameBuffer;
-import net.neoforged.fml.earlydisplay.ColourScheme;
-import net.neoforged.fml.earlydisplay.DisplayWindow;
-import net.neoforged.fml.earlydisplay.RenderElement;
-import net.neoforged.fml.earlydisplay.SimpleFont;
-import net.neoforged.fml.loading.FMLConfig;
-import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
+import net.minecraftforge.fml.earlydisplay.ColourScheme;
+import net.minecraftforge.fml.earlydisplay.DisplayWindow;
+import net.minecraftforge.fml.earlydisplay.RenderElement;
+import net.minecraftforge.fml.earlydisplay.SimpleFont;
+import net.minecraftforge.fml.loading.FMLConfig;
+import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.fml.loading.ImmediateWindowProvider;
 
 import javax.swing.*;
 import java.lang.reflect.Method;
@@ -49,6 +50,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      * an error message dialog is displayed to instruct the user to update the config.
      */
     private static void checkFMLConfig() {
+        if (true) return;//TODO
         final String windowProvider = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
         if (!WINDOW_PROVIDER.equals(windowProvider)) {
             // Create a parent frame that will appear in the taskbar
@@ -110,7 +112,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         }
 
         if (configuration.isFox()) {
-            elements.add(RenderElement.fox(font));
+            elements.add(RenderElement.anvil(font));
         }
 
         if (configuration.isLogMessages()) {
@@ -179,6 +181,21 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         return this::periodicTick;
     }
 
+    public void scheduleInit() {
+        accessor.setColourScheme(ColourScheme.BLACK);
+        final var future = accessor.getRenderScheduler().schedule(() -> {
+            accessor.getRenderLock().acquireUninterruptibly();
+            // cancel the old window tick
+            if (accessor.getWindowTick() != null) {
+                accessor.getWindowTick().cancel(false);
+            }
+            accessor.initRender("mcVersion", "forgeVersion");
+            afterInitRender("mcVersion", "forgeVersion");
+            accessor.getRenderLock().release();
+        }, 1, TimeUnit.MILLISECONDS);
+        accessor.setInitializationFuture(future);
+    }
+
     /**
      * Performs post-render initialization.
      * <p>
@@ -190,7 +207,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      * Since the scheduler is single threaded there is no possibility for race condition
      * with other scheduled tasks.
      */
-    private void afterInitRender(String mcVersion, String forgeVersion) {
+    public void afterInitRender(String mcVersion, String forgeVersion) {
         glfwMakeContextCurrent(accessor.getGlWindow());
         recreateContext();
         final List<RenderElement> elements = accessor.getElements();
@@ -211,9 +228,9 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      */
     @Override
     public void updateModuleReads(final ModuleLayer layer) {
-        var fm = layer.findModule("neoforge").orElseThrow();
+        var fm = layer.findModule("forge").orElseThrow();
         getClass().getModule().addReads(fm);
-        var clz = Class.forName(fm, "net.neoforged.neoforge.client.loading.NeoForgeLoadingOverlay");
+        var clz = FMLLoader.getGameLayer().findModule("forge").map(l -> Class.forName(l, "net.minecraftforge.client.loading.ForgeLoadingOverlay")).orElseThrow();
         var methods = Arrays.stream(clz.getMethods()).filter(m -> Modifier.isStatic(m.getModifiers())).collect(Collectors.toMap(Method::getName, Function.identity()));
         accessor.setLoadingOverlay(methods.get("newInstance"));
     }
@@ -225,7 +242,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      */
     @Override
     public void addMojangTexture(int textureId) {
-        accessor.getElements().addLast(RenderElement.mojang(textureId, accessor.getFrameCount()));
+        accessor.getElements().add(RenderElement.mojang(textureId, accessor.getFrameCount()));
     }
 
     /**

@@ -1,6 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection;
 
-import net.neoforged.fml.earlydisplay.RenderElement;
+import net.minecraftforge.fml.earlydisplay.RenderElement;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -11,8 +11,8 @@ import java.util.function.Supplier;
 import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.ReflectionAccessor.*;
 
 public class RefRenderElement {
-    public static final Class<?> RENDERER_CLASS = findClass("net.neoforged.fml.earlydisplay.RenderElement$Renderer");
-    public static final Class<?> INITIALIZER_CLASS = findClass("net.neoforged.fml.earlydisplay.RenderElement$Initializer");
+    public static final Class<?> RENDERER_CLASS = findClass("net.minecraftforge.fml.earlydisplay.RenderElement$Renderer");
+    public static final Class<?> INITIALIZER_CLASS = findClass("net.minecraftforge.fml.earlydisplay.RenderElement$Initializer");
     public static final int LOADING_INDEX_TEXTURE_OFFSET = 10;
     private static final MethodHandles.Lookup lookup = privateLookup(RenderElement.class);
     public static final int INDEX_TEXTURE_OFFSET = (int) findStaticField(lookup, "INDEX_TEXTURE_OFFSET", int.class).get() + LOADING_INDEX_TEXTURE_OFFSET;
@@ -57,7 +57,7 @@ public class RefRenderElement {
     }
 
     /**
-     * @return {@link Supplier}&lt;{@link net.neoforged.fml.earlydisplay.RenderElement.Initializer}&gt;
+     * @return {@link Supplier}&lt;{@link net.minecraftforge.fml.earlydisplay.RenderElement.Initializer}&gt;
      */
     public static Supplier<?> proxyInitializer(TextureRenderer textureRenderer) {
         return (Supplier<?>) Proxy.newProxyInstance(INITIALIZER_CLASS.getClassLoader(),
@@ -74,7 +74,7 @@ public class RefRenderElement {
     }
 
     /**
-     * @return proxied {@link net.neoforged.fml.earlydisplay.RenderElement.Renderer}
+     * @return proxied {@link net.minecraftforge.fml.earlydisplay.RenderElement.Renderer}
      * @see RendererProxy
      */
     private static Object proxyRenderer(TextureRenderer textureRenderer) {

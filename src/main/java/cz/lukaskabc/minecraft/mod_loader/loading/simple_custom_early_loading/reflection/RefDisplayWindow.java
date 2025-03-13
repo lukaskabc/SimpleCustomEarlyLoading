@@ -1,6 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection;
 
-import net.neoforged.fml.earlydisplay.*;
+import net.minecraftforge.fml.earlydisplay.*;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -63,6 +63,10 @@ public class RefDisplayWindow {
         }
     }
 
+    public ScheduledExecutorService getRenderScheduler() {
+        return (ScheduledExecutorService) renderScheduler.get(target);
+    }
+
     /**
      * Sets the {@link DisplayWindow#renderScheduler} field.
      *
@@ -72,8 +76,8 @@ public class RefDisplayWindow {
         renderScheduler.set(target, service);
     }
 
-    public ScheduledExecutorService getRenderScheduler() {
-        return (ScheduledExecutorService) renderScheduler.get(target);
+    public ScheduledFuture<?> getInitializationFuture() {
+        return (ScheduledFuture<?>) initializationFuture.get(target);
     }
 
     /**

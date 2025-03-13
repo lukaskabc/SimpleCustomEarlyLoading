@@ -4,18 +4,18 @@ import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.ref
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefRenderElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefSimpleFont;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.TextureRenderer;
-import net.neoforged.fml.earlydisplay.ColourScheme;
-import net.neoforged.fml.earlydisplay.RenderElement;
-import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
-import net.neoforged.fml.earlydisplay.SimpleFont;
-import net.neoforged.fml.loading.progress.ProgressMeter;
-import net.neoforged.fml.loading.progress.StartupNotificationManager;
+import net.minecraftforge.fml.earlydisplay.ColourScheme;
+import net.minecraftforge.fml.earlydisplay.RenderElement;
+import net.minecraftforge.fml.earlydisplay.SimpleBufferBuilder;
+import net.minecraftforge.fml.earlydisplay.SimpleFont;
+import net.minecraftforge.fml.loading.progress.ProgressMeter;
+import net.minecraftforge.fml.loading.progress.StartupNotificationManager;
 
 import java.util.List;
 import java.util.function.Supplier;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefRenderElement.getGlobalAlpha;
-import static java.lang.Math.clamp;
+import static net.minecraftforge.fml.earlydisplay.RenderElement.clamp;
 
 public class StartupProgressBar extends ProgressBar implements Supplier<RenderElement> {
     private final int lineSpacing;

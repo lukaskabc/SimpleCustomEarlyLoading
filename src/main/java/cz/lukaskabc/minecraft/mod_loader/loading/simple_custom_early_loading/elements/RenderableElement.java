@@ -4,10 +4,10 @@ import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.STB
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigurationException;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.CSB;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefRenderElement;
-import net.neoforged.fml.earlydisplay.ElementShader;
-import net.neoforged.fml.earlydisplay.QuadHelper;
-import net.neoforged.fml.earlydisplay.RenderElement;
-import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
+import net.minecraftforge.fml.earlydisplay.ElementShader;
+import net.minecraftforge.fml.earlydisplay.QuadHelper;
+import net.minecraftforge.fml.earlydisplay.RenderElement;
+import net.minecraftforge.fml.earlydisplay.SimpleBufferBuilder;
 import org.jline.utils.Log;
 
 import java.io.FileNotFoundException;
