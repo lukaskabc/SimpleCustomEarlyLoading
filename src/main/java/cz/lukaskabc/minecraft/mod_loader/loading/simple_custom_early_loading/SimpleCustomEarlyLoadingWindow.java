@@ -31,7 +31,7 @@ import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 
 public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
-    public static final String WINDOW_PROVIDER = "SimpleCustomEarlyLoading";
+    public static final String EXPECTED_WINDOW_PROVIDER = "fmlearlywindow";
     private final RefDisplayWindow accessor;
     private final Config configuration;
 
@@ -40,21 +40,19 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         checkFMLConfig();
         ConfigLoader.copyDefaultConfig();
         configuration = ConfigLoader.loadConfiguration();
-
     }
 
     /**
-     * Checks whether the FML configuration has the {@link #WINDOW_PROVIDER} set as the {@link FMLConfig.ConfigValue#EARLY_WINDOW_PROVIDER EARLY_WINDOW_PROVIDER}.
+     * Checks whether the FML configuration has the {@link #EXPECTED_WINDOW_PROVIDER} set as the {@link FMLConfig.ConfigValue#EARLY_WINDOW_PROVIDER EARLY_WINDOW_PROVIDER}.
      * <p>
      * If the value does not match,
      * an error message dialog is displayed to instruct the user to update the config.
      */
     private static void checkFMLConfig() {
-        if (true) return;//TODO
         final String windowProvider = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
-        if (!WINDOW_PROVIDER.equals(windowProvider)) {
+        if (!EXPECTED_WINDOW_PROVIDER.equals(windowProvider)) {
             // Create a parent frame that will appear in the taskbar
-            final JFrame frame = new JFrame("Missing NeoForge configuration");
+            final JFrame frame = new JFrame("Missing Forge configuration");
             frame.setAlwaysOnTop(true);
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             frame.setLocationRelativeTo(null); // Center on screen
@@ -70,7 +68,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
                             
                             Do you wish to update the config?
                             Answering yes will update the config and exit the game.
-                            """.replace("WINDOW_PROVIDER", WINDOW_PROVIDER),
+                            """.replace("WINDOW_PROVIDER", EXPECTED_WINDOW_PROVIDER),
                     "Missing NeoForge configuration",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE
@@ -79,7 +77,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
             frame.dispose();
 
             if (answer == JOptionPane.YES_OPTION) {
-                FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, WINDOW_PROVIDER);
+                FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, EXPECTED_WINDOW_PROVIDER);
                 System.exit(0);
             }
         }
@@ -131,7 +129,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      */
     @Override
     public String name() {
-        return WINDOW_PROVIDER;
+        return EXPECTED_WINDOW_PROVIDER;
     }
 
     /**
