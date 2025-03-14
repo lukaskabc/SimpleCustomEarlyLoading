@@ -15,23 +15,68 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.SimpleCustomEarlyLoadingWindow.EXPECTED_WINDOW_PROVIDER;
+
 public class DummyModLocator implements IModLocator {
     private static final Logger LOG = LogManager.getLogger();
 
+    /**
+     * Constructed by {@link net.minecraftforge.fml.loading.moddiscovery.ModDiscoverer ModDiscoverer}
+     * <pre><code>
+     *     modLocatorList = ServiceLoaderUtils.streamServiceLoader(()-> modLocators, sce->LOGGER.error("Failed to load mod locator list", sce)).collect(Collectors.toList());
+     * </code></pre>
+     * At time of construction, the {@link DisplayWindow} was already constructed and initialization scheduled.
+     * Since the initialization is happening asynchronously we can't assume any specific state.
+     * <p>
+     */
     public DummyModLocator() {
-        // TODO: assert dummyprovider, otherwise show error pop up
-        final SimpleCustomEarlyLoadingWindow provider = new SimpleCustomEarlyLoadingWindow();
-        final RefDisplayWindow oldProvider = new RefDisplayWindow((DisplayWindow) RefImmediateWindowHandler.getProvider());
+        LOG.debug("Injecting Simple Custom Early Loading");
+        injectAndReplaceEarlyWindow();
+        LOG.info("Injected Simple Custom Early Loading");
+    }
+
+    /**
+     * Constructs {@link SimpleCustomEarlyLoadingWindow}
+     * and verifies that the current {@link net.minecraftforge.fml.loading.ImmediateWindowHandler#provider ImmediateWindowHandler#provider} is an instance of {@link DisplayWindow}
+     * and so it is possible to replace it with the new instance.
+     */
+    private static void injectAndReplaceEarlyWindow() {
+        final SimpleCustomEarlyLoadingWindow newProvider = new SimpleCustomEarlyLoadingWindow();
+        if (EXPECTED_WINDOW_PROVIDER.equals(RefImmediateWindowHandler.getProvider().name()) &&
+                RefImmediateWindowHandler.getProvider() instanceof DisplayWindow oldProvider) {
+            replaceImmediateWindowHandler(newProvider, oldProvider);
+        } else {
+            LOG.error("""
+                            Something went really wrong!
+                            Immediate window provider mismatch!
+                            Expected: {}
+                            Actual: {}
+                            The Simple Custom Early loading can't be injected.
+                            """,
+                    DisplayWindow.class,
+                    RefImmediateWindowHandler.getProvider().getClass());
+        }
+    }
+
+    /**
+     * Since we can't be sure about the initialization state of the {@link DisplayWindow} we need to synchronize with it as much as possible.
+     * {@link DisplayWindow#initialize(String[])} and {@link DisplayWindow#start(String, String)} are called synchronously before initialization of {@link DummyModLocator}.
+     * We are sure that {@link DisplayWindow#initializationFuture} is set - not sure about its state.
+     *
+     * @param newProvider
+     * @param oldProvider
+     */
+    private static void replaceImmediateWindowHandler(SimpleCustomEarlyLoadingWindow newProvider, DisplayWindow oldProvider) {
+        final RefDisplayWindow displayWindow = new RefDisplayWindow(oldProvider);
         try {
-            oldProvider.getInitializationFuture().get();
+            displayWindow.getInitializationFuture().get();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        ObjectFieldCopier.copyAllFields(RefImmediateWindowHandler.getProvider(), provider, DisplayWindow.class);
-        RefImmediateWindowHandler.setProvider(provider);
-        provider.scheduleInit();
-        FMLLoader.progressWindowTick = provider::periodicTick;
-        LOG.info("Injected Simple Custom Early Loading");
+        ObjectFieldCopier.copyAllFields(RefImmediateWindowHandler.getProvider(), newProvider, DisplayWindow.class);
+        RefImmediateWindowHandler.setProvider(newProvider);
+        newProvider.scheduleInit();
+        FMLLoader.progressWindowTick = newProvider::periodicTick;
     }
 
     @Override
