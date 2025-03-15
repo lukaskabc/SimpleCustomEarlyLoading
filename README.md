@@ -3,7 +3,11 @@
 <a href="https://www.curseforge.com/minecraft/mc-mods/simple-custom-early-loading" target="_blank"><img src="https://img.shields.io/curseforge/dt/1214077?style=for-the-badge&logo=curseforge&color=626e7b" alt="Curseforge"></a>
 <a href="https://modrinth.com/mod/simple-custom-early-loading" target="_blank"><img src="https://img.shields.io/modrinth/dt/simple-custom-early-loading?style=for-the-badge&logo=modrinth&color=626e7b" alt="Modrinth"></a>
 
-This _mod_ allows the customization of Neoforge's early loading screen.
+This _mod_ allows the customization of **Neoforge's** early loading screen.
+
+There is also a quite "hacky" version for **Forge** `1.20.1, 1.20.2, 1.20.4, 1.20.6`.  
+I do not plan to continue in supporting other Forge versions due to technical reasons.  
+**For newer versions, please use the NeoForge.**
 
 ![Preview](./preview.png)
 
