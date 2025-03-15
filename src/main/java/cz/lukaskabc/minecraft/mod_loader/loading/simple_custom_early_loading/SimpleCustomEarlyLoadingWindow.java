@@ -112,7 +112,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
             elements.add(RenderElement.performanceBar(font));
         }
 
-        if (configuration.isFox()) {
+        if (configuration.isAnvil()) {
             elements.add(anvil);
         }
 
@@ -201,8 +201,6 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      * <p>
      * Establishes the OpenGL context, recreates the render context, and constructs render elements.
      *
-     * @param mcVersion    The Minecraft version.
-     * @param forgeVersion The Forge version.
      * @implNote The method is called after init render is called inside the same schedule.
      * Since the scheduler is single threaded there is no possibility for race condition
      * with other scheduled tasks.

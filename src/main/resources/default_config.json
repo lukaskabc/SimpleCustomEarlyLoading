@@ -30,7 +30,7 @@
     "y": 70
   },
   "performance_bar": true,
-  "fox": true,
+  "anvil": true,
   "log_messages": true,
   "forge_version": true
   // I dont think it would be nice to remove the mojang logo and change the branding, so I am not allowing it here

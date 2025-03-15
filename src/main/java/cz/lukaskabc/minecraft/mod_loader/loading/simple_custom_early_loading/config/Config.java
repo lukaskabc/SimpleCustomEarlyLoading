@@ -10,7 +10,7 @@ public class Config {
     private List<Element> elements = new ArrayList<>(0);
     private ProgressBarConfig progressBar = null;
     private boolean performanceBar = true;
-    private boolean fox = true;
+    private boolean anvil = true;
     private boolean logMessages = true;
     private boolean forgeVersion = true;
 
@@ -38,12 +38,12 @@ public class Config {
         this.performanceBar = performanceBar;
     }
 
-    public boolean isFox() {
-        return fox;
+    public boolean isAnvil() {
+        return anvil;
     }
 
-    public void setFox(boolean fox) {
-        this.fox = fox;
+    public void setAnvil(boolean anvil) {
+        this.anvil = anvil;
     }
 
     public boolean isLogMessages() {
