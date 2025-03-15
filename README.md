@@ -8,6 +8,7 @@ This _mod_ allows the customization of **Neoforge's** early loading screen.
 There is also a quite "hacky" version for **Forge** `1.20.1, 1.20.2, 1.20.4, 1.20.6`.  
 I do not plan to continue in supporting other Forge versions due to technical reasons.  
 **For newer versions, please use the NeoForge.**
+See forge version description: [Releases](https://github.com/lukaskabc/SimpleCustomEarlyLoading/releases).
 
 ![Preview](./preview.png)
 
@@ -24,7 +25,7 @@ I won't allow removing the Mojang logo.
 - toggle bottom left log
 - toggle NeoForge's version (bottom right)
 
-## Installation:
+## Installation - NeoForge:
 
 1. place the jar in the mods folder
 2. modify the `config/fml.toml` file
@@ -36,6 +37,24 @@ earlyWindowProvider = "SimpleCustomEarlyLoading"
 # Optionally set the window to be maximized
 earlyWindowMaximized = true
 ```
+
+## Installation - Forge:
+
+1. place the jar in the mods folder
+2. forge version requires default `config/fml.toml` value
+
+```toml
+#Early window provider
+earlyWindowProvider = "fmlearlywindow"
+```
+
+3. Optional: update `options.txt`: `darkMojangStudiosBackground:true`
+
+Unfortunately, the override is applied quite late,
+which may result in the original red early loading (or a white screen) to "flash" on the very game start.
+I can't do anything about that.
+
+However, the red color of the original loading can be changed using `darkMojangStudiosBackground:true` in `options.txt`.
 
 ## Configuration:
 
