@@ -5,7 +5,7 @@ name: Automatically publish to Modrinth and CurseForge
 # The release description is used as the changelog
 on:
   release:
-    types: [ published ]
+    types: [ created ]
 
 env:
   JAVA_VERSION: 17
