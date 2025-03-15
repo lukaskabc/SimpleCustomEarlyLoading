@@ -17,7 +17,7 @@ env:
     1.20.6
   GAME_VERSION_FILTER: releases
   VERSION_TYPE: release
-  PRIMARY_FILE_GLOB: build/libs/SimpleCustomEarlyLoading-*.jar
+  PRIMARY_FILE_GLOB: SimpleCustomEarlyLoading-*.jar
 
 jobs:
   build:
@@ -68,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: ${{ env.PRIMARY_FILE_GLOB }}
+          path: build/libs/${{ env.PRIMARY_FILE_GLOB }}
 
   publish-to-github:
     needs: build
