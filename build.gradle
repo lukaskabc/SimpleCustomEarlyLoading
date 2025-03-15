@@ -78,6 +78,12 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
+// move the final jar to run/mods directory
+tasks.register('copyJar', Copy) {
+    from tasks.jar.outputs.files
+    into file("$rootDir/run/mods")
+}
+
 idea {
     module {
         downloadSources = true

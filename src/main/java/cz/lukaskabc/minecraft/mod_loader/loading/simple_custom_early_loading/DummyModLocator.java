@@ -13,6 +13,8 @@ import org.apache.logging.log4j.Logger;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledFuture;
 import java.util.function.Consumer;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.SimpleCustomEarlyLoadingWindow.EXPECTED_WINDOW_PROVIDER;
@@ -43,8 +45,9 @@ public class DummyModLocator implements IModLocator {
     private static void injectAndReplaceEarlyWindow() {
         final SimpleCustomEarlyLoadingWindow newProvider = new SimpleCustomEarlyLoadingWindow();
         if (EXPECTED_WINDOW_PROVIDER.equals(RefImmediateWindowHandler.getProvider().name()) &&
-                RefImmediateWindowHandler.getProvider() instanceof DisplayWindow oldProvider) {
-            replaceImmediateWindowHandler(newProvider, oldProvider);
+                RefImmediateWindowHandler.getProvider().getClass().equals(DisplayWindow.class)) {
+            // not using instance of since we don't want any child classes, we want specifically DisplayWindow
+            replaceImmediateWindowHandler(newProvider, (DisplayWindow) RefImmediateWindowHandler.getProvider());
         } else {
             LOG.error("""
                             Something went really wrong!
@@ -58,6 +61,7 @@ public class DummyModLocator implements IModLocator {
         }
     }
 
+
     /**
      * Since we can't be sure about the initialization state of the {@link DisplayWindow} we need to synchronize with it as much as possible.
      * {@link DisplayWindow#initialize(String[])} and {@link DisplayWindow#start(String, String)} are called synchronously before initialization of {@link DummyModLocator}.
@@ -68,15 +72,21 @@ public class DummyModLocator implements IModLocator {
      */
     private static void replaceImmediateWindowHandler(SimpleCustomEarlyLoadingWindow newProvider, DisplayWindow oldProvider) {
         final RefDisplayWindow displayWindow = new RefDisplayWindow(oldProvider);
+        final ScheduledFuture<?> initializationFuture = displayWindow.getInitializationFuture();
+        // await the window initialization
         try {
-            displayWindow.getInitializationFuture().get();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            initializationFuture.get();
+        } catch (ExecutionException e) {
+            LOG.atError().withThrowable(e).log("Early loading initialization failed");
+            return;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return;
         }
+
         ObjectFieldCopier.copyAllFields(RefImmediateWindowHandler.getProvider(), newProvider, DisplayWindow.class);
         RefImmediateWindowHandler.setProvider(newProvider);
-        newProvider.scheduleInit();
-        FMLLoader.progressWindowTick = newProvider::periodicTick;
+        FMLLoader.progressWindowTick = newProvider.reinitializeAfterStateCopy();
     }
 
     @Override

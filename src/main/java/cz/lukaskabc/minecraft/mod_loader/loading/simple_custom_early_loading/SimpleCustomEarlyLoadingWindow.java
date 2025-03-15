@@ -14,6 +14,8 @@ import net.minecraftforge.fml.earlydisplay.SimpleFont;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.ImmediateWindowProvider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.lang.reflect.Method;
@@ -21,17 +23,16 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
-import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11C.glClearColor;
 
 public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
     public static final String EXPECTED_WINDOW_PROVIDER = "fmlearlywindow";
+    private static final Logger LOG = LogManager.getLogger();
     private final RefDisplayWindow accessor;
     private final Config configuration;
 
@@ -86,12 +87,14 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
     /**
      * Constructs the elements to be rendered in the loading window.
      *
-     * @param mcVersion    The Minecraft version.
-     * @param forgeVersion The Forge version.
-     * @param elements     The list where render elements will be added.
+     * @param elements The list where render elements will be added.
      */
-    private void constructElements(String mcVersion, String forgeVersion, final List<RenderElement> elements) {
+    private void constructElements(final List<RenderElement> elements) {
         final SimpleFont font = accessor.getFont();
+        final RenderElement anvil = elements.get(0);
+        final RenderElement logMessageOverlay = elements.get(1);
+        final RenderElement forgeVersionOverlay = elements.get(2);
+        elements.clear();
 
         Optional.ofNullable(configuration.getElements()).ifPresent(list -> {
             list.forEach(el -> {
@@ -110,17 +113,17 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         }
 
         if (configuration.isFox()) {
-            elements.add(RenderElement.anvil(font));
+            elements.add(anvil);
         }
 
         if (configuration.isLogMessages()) {
             // bottom left log messages
-            elements.add(RenderElement.logMessageOverlay(font));
+            elements.add(logMessageOverlay);
         }
 
         if (configuration.isForgeVersion()) {
             // bottom right game version
-            elements.add(RenderElement.forgeVersionOverlay(font, mcVersion + "-" + forgeVersion.split("-")[0]));
+            elements.add(forgeVersionOverlay);
         }
     }
 
@@ -133,65 +136,64 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
     }
 
     /**
-     * Calls the super method and sets the colour scheme to black.
+     * In Forge context should never be called.
      *
-     * @param arguments The arguments provided to the Java process.
-     *                  This is the entire command line, so you can process stuff from it.
-     * @return result of the super method
-     * @see DisplayWindow#initialize(String[])
+     * @throws AssertionError always
+     * @see #reinitializeAfterStateCopy()
      */
     @Override
     public Runnable initialize(String[] arguments) {
-        final Runnable result = super.initialize(arguments);
-        // force black colour scheme
-        accessor.setColourScheme(ColourScheme.BLACK);
-        return result;
+        throw new AssertionError("The Simple Custom Early Loading Window should not be initialized in Forge context!");
     }
 
     /**
-     * Reimplements the super method {@link DisplayWindow#start(String, String)}<br>
-     * and injects {@link #afterInitRender(String, String)}<br>
-     * that is called after {@link DisplayWindow#initRender(String, String)}
-     * <p>
-     * Starts the loading window rendering process.
-     * <p>
-     * Schedules the window's rendering initialization and sets up a periodic tick.
+     * In Forge context should never be called.
      *
-     * @param mcVersion    The Minecraft version.
-     * @param forgeVersion The Forge version.
-     * @return A Runnable responsible for the periodic tick.
-     * @see DisplayWindow#start(String, String)
+     * @throws AssertionError always
+     * @see #reinitializeAfterStateCopy()
      */
     @Override
     public Runnable start(String mcVersion, String forgeVersion) {
-        final ScheduledExecutorService renderScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-            final Thread thread = Executors.defaultThreadFactory().newThread(r);
-            thread.setDaemon(true);
-            return thread;
-        });
-        accessor.setRenderScheduler(renderScheduler);
-        initWindow(mcVersion);
-        final var initializationFuture = renderScheduler.schedule(() -> {
-            accessor.initRender(mcVersion, forgeVersion);
-            afterInitRender(mcVersion, forgeVersion);
-        }, 1, TimeUnit.MILLISECONDS);
-        accessor.setInitializationFuture(initializationFuture);
-        return this::periodicTick;
+        throw new AssertionError("The Simple Custom Early Loading Window should not be initialized in Forge context!");
     }
 
-    public void scheduleInit() {
+    public Runnable reinitializeAfterStateCopy() {
+        // from initialize method
         accessor.setColourScheme(ColourScheme.BLACK);
+        // from start method
         final var future = accessor.getRenderScheduler().schedule(() -> {
-            accessor.getRenderLock().acquireUninterruptibly();
+            try {
+                accessor.getRenderLock().acquire(); // block rendering
+            } catch (final InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+
+            // from initWindow
+            // rebind callbacks to the new instance
+            glfwSetFramebufferSizeCallback(accessor.getGlWindow(), accessor::fbResize);
+            glfwSetWindowPosCallback(accessor.getGlWindow(), accessor::winMove);
+            glfwSetWindowSizeCallback(accessor.getGlWindow(), accessor::winResize);
+
             // cancel the old window tick
             if (accessor.getWindowTick() != null) {
-                accessor.getWindowTick().cancel(false);
+                while (!accessor.getWindowTick().isDone()) {
+                    accessor.getWindowTick().cancel(false);
+                }
+            } else {
+                // TODO: this is potentially a problem, if the window tick was null,
+                //  then the window was already handed over to the game
+                LOG.error("Early window was already handed over to the game - that was fast! Aborting Simple Custom Early Loading initialization.");
+                return;
             }
-            accessor.initRender("mcVersion", "forgeVersion");
-            afterInitRender("mcVersion", "forgeVersion");
+            // from initRender
+            accessor.setWindowTick(accessor.getRenderScheduler().scheduleAtFixedRate(accessor::renderThreadFunc, 50, 50, TimeUnit.MILLISECONDS));
+            accessor.getRenderScheduler().scheduleAtFixedRate(() -> accessor.getAnimationTimerTrigger().set(true), 1, 50, TimeUnit.MILLISECONDS);
+            afterInitRender();
             accessor.getRenderLock().release();
         }, 1, TimeUnit.MILLISECONDS);
         accessor.setInitializationFuture(future);
+        return this::periodicTick;
     }
 
     /**
@@ -205,12 +207,14 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      * Since the scheduler is single threaded there is no possibility for race condition
      * with other scheduled tasks.
      */
-    public void afterInitRender(String mcVersion, String forgeVersion) {
+    public void afterInitRender() {
         glfwMakeContextCurrent(accessor.getGlWindow());
+        // Set the clear color based on the colour scheme
+        final ColourScheme colourScheme = accessor.getColourScheme();
+        glClearColor(colourScheme.background().redf(), colourScheme.background().greenf(), colourScheme.background().bluef(), 1f);
         recreateContext();
         final List<RenderElement> elements = accessor.getElements();
-        elements.clear();
-        constructElements(mcVersion, forgeVersion, elements);
+        constructElements(elements);
         glfwMakeContextCurrent(0);
     }
 
@@ -264,7 +268,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
                 height[0],
                 oldContext.scale(),
                 oldContext.elementShader(),
-                oldContext.colourScheme(),
+                accessor.getColourScheme(),
                 oldContext.performance()
         );
         accessor.setContext(context);
