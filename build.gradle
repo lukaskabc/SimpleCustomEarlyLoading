@@ -11,6 +11,7 @@ tasks.named('wrapper', Wrapper).configure {
 
 group = 'cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading'
 version = mod_version
+archivesBaseName = rootProject.name + "-forge-" + jar_minecraft_version
 
 repositories {
     mavenLocal()
@@ -23,6 +24,11 @@ dependencies {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+// copy the final jar to run/mods directory
+tasks.register('copyJar', Copy) {
+    from tasks.jar.outputs.files
+    into file("$rootDir/run/mods")
+}
 
 legacyForge {
     // Specify the version of Forge to use.
@@ -36,6 +42,7 @@ legacyForge {
 
         client {
             client()
+            taskBefore tasks.named("copyJar")
         }
 
         server {
@@ -76,12 +83,6 @@ neoFormRuntime {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
-}
-
-// move the final jar to run/mods directory
-tasks.register('copyJar', Copy) {
-    from tasks.jar.outputs.files
-    into file("$rootDir/run/mods")
 }
 
 idea {

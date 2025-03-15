@@ -8,10 +8,13 @@ on:
     types: [ published ]
 
 env:
-  JAVA_VERSION: 21
-  MOD_LOADERS: neoforge
+  JAVA_VERSION: 17
+  MOD_LOADERS: forge
   GAME_VERSIONS: |
-    [1.21,1.21.4]
+    1.20.1
+    1.20.2
+    1.20.4
+    1.20.6
   GAME_VERSION_FILTER: releases
   VERSION_TYPE: release
   PRIMARY_FILE_GLOB: build/libs/SimpleCustomEarlyLoading-*.jar
