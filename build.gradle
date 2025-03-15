@@ -11,7 +11,7 @@ tasks.named('wrapper', Wrapper).configure {
 
 group = 'cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading'
 version = mod_version
-archivesBaseName = rootProject.name + "-forge-" + jar_minecraft_version
+archivesBaseName = rootProject.name + "-" + jar_minecraft_version
 
 repositories {
     mavenLocal()
