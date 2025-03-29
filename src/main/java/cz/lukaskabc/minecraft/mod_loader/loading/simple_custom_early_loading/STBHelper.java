@@ -21,9 +21,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.file.Path;
 
+import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefRenderElement.INDEX_TEXTURE_OFFSET;
 import static org.lwjgl.opengl.GL32C.*;
 
 public class STBHelper {
+    public static final int TEXTURE_UNIT = GL_TEXTURE0 + INDEX_TEXTURE_OFFSET;
 
     private STBHelper() {
         throw new AssertionError();
@@ -50,19 +52,24 @@ public class STBHelper {
         return MemoryUtil.memSlice(buf); // we trim the final buffer to the size of the content
     }
 
-    public static void resolveAndBindTexture(String file, int size, int textureNumber) throws FileNotFoundException {
+    /**
+     * @return textureId
+     */
+    public static int resolveAndBindTexture(String file, int size) throws FileNotFoundException {
         int[] lw = new int[1];
         int[] lh = new int[1];
         int[] lc = new int[1];
         final ByteBuffer img = loadImageFromClasspath(file, size, lw, lh, lc);
         int texid = glGenTextures();
-        glActiveTexture(textureNumber);
+        glActiveTexture(TEXTURE_UNIT);
         glBindTexture(GL_TEXTURE_2D, texid);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lw[0], lh[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
         MemoryUtil.memFree(img);
+        return texid;
     }
 
     public static ByteBuffer loadImageFromClasspath(String file, int size, int[] width, int[] height, int[] channels) throws FileNotFoundException {

@@ -3,8 +3,8 @@ package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.Config;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigLoader;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ElementType;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.RenderableElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StartupProgressBar;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StaticTextureElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefEarlyFrameBuffer;
 import net.neoforged.fml.earlydisplay.ColourScheme;
@@ -95,7 +95,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
 
         Optional.ofNullable(configuration.getElements()).ifPresent(list -> {
             list.forEach(el -> {
-                elements.add(new RenderableElement(el.getImage(), ElementType.ABSOLUTE.equals(el.getType()), el.getCoords()).get());
+                elements.add(new StaticTextureElement(el.getImage(), ElementType.ABSOLUTE.equals(el.getType()), el.getCoords()).get());
             });
         });
 
