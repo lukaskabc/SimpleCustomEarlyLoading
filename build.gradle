@@ -20,6 +20,12 @@ repositories {
 
 dependencies {
     api("org.jspecify:jspecify:1.0.0")
+    jarJar(implementation("japng:api")) {
+        version {
+            strictly '[0.5.1]'
+            prefer '0.5.1'
+        }
+    }
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)

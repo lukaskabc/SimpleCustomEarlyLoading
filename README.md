@@ -68,6 +68,10 @@ This is a simplified version of [StargateEarlyLoading mod](https://github.com/lu
 If you are interested in some implementation details,
 see [implementation description of StargateEarlyLoading](https://github.com/lukaskabc/StargateEarlyLoading/blob/main/docs/implementation.md).
 
+# Copyright
+
+Japng © Copyright A. Ellerton.  
+Japng is licensed under Apache-2.0.
 ___
 
 NOT AN OFFICIAL MINECRAFT PRODUCT/SERVICE/MOD. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT
