@@ -3,6 +3,7 @@ plugins {
     id 'maven-publish'
     id 'idea'
     id 'net.neoforged.moddev.legacyforge' version '2.0.78'
+    id 'com.gradleup.shadow' version '8.3.6'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -18,14 +19,13 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    shade
+    implementation.extendsFrom shade
+}
 dependencies {
     api("org.jspecify:jspecify:1.0.0")
-    jarJar(implementation("japng:api")) {
-        version {
-            strictly '[0.5.1]'
-            prefer '0.5.1'
-        }
-    }
+    shade implementation("japng:api:0.5.1")
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -80,6 +80,32 @@ publishing {
         maven {
             url "file://${project.projectDir}/repo"
         }
+    }
+}
+
+
+shadowJar {
+    archiveFileName = "${rootProject.name}-${project.version}.jar"
+    configurations = [project.configurations.shade]
+
+    mergeServiceFiles()
+
+    from('LICENSE') {
+        into('/')
+    }
+    from('NOTICE') {
+        into('/')
+    }
+}
+assemble.dependsOn('shadowJar')
+
+tasks.named('jar', Jar).configure {
+    archiveClassifier.set('lite')
+    from('LICENSE') {
+        into('/')
+    }
+    from('NOTICE') {
+        into('/')
     }
 }
 
