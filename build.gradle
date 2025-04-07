@@ -115,6 +115,21 @@ neoFormRuntime {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+
+    doFirst {
+        // Path to the generated module-info.java
+        File moduleInfoFile = file("${temporaryDir}/module-info.java")
+
+        if (moduleInfoFile.exists()) {
+            String content = moduleInfoFile.text
+            // Add JSpecify annotation to the module declaration
+            content = content.replace(
+                    "module SimpleCustomEarlyLoading.main {",
+                    "@org.jspecify.annotations.NullMarked\nmodule SimpleCustomEarlyLoading.main {"
+            )
+            moduleInfoFile.text = content
+        }
+    }
 }
 
 idea {
