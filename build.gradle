@@ -23,10 +23,6 @@ configurations {
     shade
     implementation.extendsFrom shade
 }
-dependencies {
-    api("org.jspecify:jspecify:1.0.0")
-    shade implementation("japng:api:0.5.1")
-}
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -42,6 +38,7 @@ legacyForge {
 
     runs {
         configureEach {
+            jvmArguments.add("-ea")
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             logLevel = org.slf4j.event.Level.DEBUG
         }
@@ -67,6 +64,12 @@ legacyForge {
     }
 }
 
+dependencies {
+    api("org.jspecify:jspecify:1.0.0")
+    shade implementation("japng:api:0.5.1")
+    clientAdditionalRuntimeClasspath("japng:api:0.5.1")
+}
+
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 
@@ -87,6 +90,8 @@ publishing {
 shadowJar {
     archiveFileName = "${rootProject.name}-${project.version}.jar"
     configurations = [project.configurations.shade]
+
+    relocate 'net.ellerton.japng', 'cz.lukaskabc.minecraft.mod_loader.shaded.japng'
 
     mergeServiceFiles()
 
@@ -115,21 +120,6 @@ neoFormRuntime {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
-
-    doFirst {
-        // Path to the generated module-info.java
-        File moduleInfoFile = file("${temporaryDir}/module-info.java")
-
-        if (moduleInfoFile.exists()) {
-            String content = moduleInfoFile.text
-            // Add JSpecify annotation to the module declaration
-            content = content.replace(
-                    "module SimpleCustomEarlyLoading.main {",
-                    "@org.jspecify.annotations.NullMarked\nmodule SimpleCustomEarlyLoading.main {"
-            )
-            moduleInfoFile.text = content
-        }
-    }
 }
 
 idea {
