@@ -6,9 +6,10 @@
  * Changes:
  * - Magnification filter to nearest
  */
-package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading;
+package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.stb;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigLoader;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryUtil;
@@ -24,10 +25,10 @@ import java.nio.file.Path;
 import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefRenderElement.INDEX_TEXTURE_OFFSET;
 import static org.lwjgl.opengl.GL32C.*;
 
-public class STBHelper {
+public class StaticSTBHelper {
     public static final int TEXTURE_UNIT = GL_TEXTURE0 + INDEX_TEXTURE_OFFSET;
 
-    private STBHelper() {
+    private StaticSTBHelper() {
         throw new AssertionError();
     }
 
@@ -59,22 +60,28 @@ public class STBHelper {
         int[] lw = new int[1];
         int[] lh = new int[1];
         int[] lc = new int[1];
-        final ByteBuffer img = loadImageFromClasspath(file, size, lw, lh, lc);
+
+        final InputStream inputStream = ConfigLoader.resolveFile(Path.of(file));
+        ByteBuffer buf = readToBuffer(inputStream, size);
+        final ByteBuffer img = STBImage.stbi_load_from_memory(buf, lw, lh, lc, 4);
+
         int texid = glGenTextures();
-        glActiveTexture(TEXTURE_UNIT);
-        glBindTexture(GL_TEXTURE_2D, texid);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, lw[0], lh[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, img);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        MemoryUtil.memFree(img);
+        bindTexture(img, texid, lw, lh);
+
         return texid;
     }
 
-    public static ByteBuffer loadImageFromClasspath(String file, int size, int[] width, int[] height, int[] channels) throws FileNotFoundException {
-        final InputStream inputStream = ConfigLoader.resolveFile(Path.of(file));
-        ByteBuffer buf = readToBuffer(inputStream, size);
-        return STBImage.stbi_load_from_memory(buf, width, height, channels, 4);
+    /**
+     * The byte buffer will be freed.
+     */
+    public static void bindTexture(@Nullable ByteBuffer textureData, int textureId, int[] width, int[] height) {
+        glActiveTexture(TEXTURE_UNIT);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width[0], height[0], 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        MemoryUtil.memFree(textureData);
     }
 }

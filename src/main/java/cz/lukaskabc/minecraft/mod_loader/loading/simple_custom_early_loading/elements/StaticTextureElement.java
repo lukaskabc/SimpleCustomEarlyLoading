@@ -1,17 +1,17 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.STBHelper;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigurationException;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.CSB;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.stb.StaticSTBHelper;
 import net.neoforged.fml.earlydisplay.ElementShader;
 import net.neoforged.fml.earlydisplay.QuadHelper;
 import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
 import org.jline.utils.Log;
-import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GL32C;
 
 import java.io.FileNotFoundException;
 
-import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL32C.GL_TEXTURE_2D;
 
 /**
  * Renders a single static texture.
@@ -28,7 +28,7 @@ public class StaticTextureElement implements ElementSupplier {
         this.coords = coords;
         this.absolute = absolute;
         try {
-            textureId = STBHelper.resolveAndBindTexture(texture, DEFAULT_TEXTURE_SIZE);
+            textureId = StaticSTBHelper.resolveAndBindTexture(texture, DEFAULT_TEXTURE_SIZE);
         } catch (FileNotFoundException e) {
             Log.error("Failed to load texture: ", e.getMessage());
             throw new ConfigurationException(e);
@@ -51,11 +51,11 @@ public class StaticTextureElement implements ElementSupplier {
         final float[] coords = absolute ? this.coords : relativeCoords(this.coords, csb);
         csb.ctx().elementShader().updateTextureUniform(0);
         csb.ctx().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
-        GL11C.glBindTexture(GL_TEXTURE_2D, textureId);
+        GL32C.glBindTexture(GL_TEXTURE_2D, textureId);
         csb.buffer().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
         QuadHelper.loadQuad(csb.buffer(), coords[0], coords[1], coords[2], coords[3], 0f, 1f, 0f, 1f, COLOR);
         csb.buffer().draw();
-        GL11C.glBindTexture(GL_TEXTURE_2D, 0);
+        GL32C.glBindTexture(GL_TEXTURE_2D, 0);
     }
 
 }

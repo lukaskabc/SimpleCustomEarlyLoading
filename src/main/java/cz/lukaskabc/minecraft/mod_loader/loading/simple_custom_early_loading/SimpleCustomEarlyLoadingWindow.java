@@ -2,9 +2,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.Config;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigLoader;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ElementType;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StartupProgressBar;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StaticTextureElement;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.ApngTextureElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefEarlyFrameBuffer;
 import net.neoforged.fml.earlydisplay.ColourScheme;
@@ -19,7 +17,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -92,36 +89,40 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      */
     private void constructElements(String mcVersion, String forgeVersion, final List<RenderElement> elements) {
         final SimpleFont font = accessor.getFont();
+//
+//        Optional.ofNullable(configuration.getElements()).ifPresent(list -> {
+//            list.forEach(el -> {
+//                elements.add(new StaticTextureElement(el.getImage(), ElementType.ABSOLUTE.equals(el.getType()), el.getCoords()).get());
+//            });
+//        });
+//
+//        Optional.ofNullable(configuration.getProgressBar()).ifPresent(bar -> {
+//            elements.add(new StartupProgressBar(font, ElementType.ABSOLUTE.equals(bar.getType()), bar.getCoords()).get());
+//        });
+//
+//        // from forge early loading:
+//        if (configuration.isPerformanceBar()) {
+//            // top middle memory info
+//            elements.add(RenderElement.performanceBar(font));
+//        }
+//
+//        if (configuration.isFox()) {
+//            elements.add(RenderElement.fox(font));
+//        }
+//
+//        if (configuration.isLogMessages()) {
+//            // bottom left log messages
+//            elements.add(RenderElement.logMessageOverlay(font));
+//        }
+//
+//        if (configuration.isForgeVersion()) {
+//            // bottom right game version
+//            elements.add(RenderElement.forgeVersionOverlay(font, mcVersion + "-" + forgeVersion.split("-")[0]));
+//        }
 
-        Optional.ofNullable(configuration.getElements()).ifPresent(list -> {
-            list.forEach(el -> {
-                elements.add(new StaticTextureElement(el.getImage(), ElementType.ABSOLUTE.equals(el.getType()), el.getCoords()).get());
-            });
-        });
-
-        Optional.ofNullable(configuration.getProgressBar()).ifPresent(bar -> {
-            elements.add(new StartupProgressBar(font, ElementType.ABSOLUTE.equals(bar.getType()), bar.getCoords()).get());
-        });
-
-        // from forge early loading:
-        if (configuration.isPerformanceBar()) {
-            // top middle memory info
-            elements.add(RenderElement.performanceBar(font));
-        }
-
-        if (configuration.isFox()) {
-            elements.add(RenderElement.fox(font));
-        }
-
-        if (configuration.isLogMessages()) {
-            // bottom left log messages
-            elements.add(RenderElement.logMessageOverlay(font));
-        }
-
-        if (configuration.isForgeVersion()) {
-            // bottom right game version
-            elements.add(RenderElement.forgeVersionOverlay(font, mcVersion + "-" + forgeVersion.split("-")[0]));
-        }
+        // TODO: debugging apng
+        elements.add(new ApngTextureElement("neoforge-two-foxes.apng",
+                false, new float[]{0, 0, 100, 100}).get());
     }
 
     /**
