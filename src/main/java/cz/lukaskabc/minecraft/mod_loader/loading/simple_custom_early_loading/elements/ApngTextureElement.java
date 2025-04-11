@@ -52,8 +52,8 @@ public class ApngTextureElement implements ElementSupplier {
         final float[] uv = new float[4];
         final int[] currentTextureSize = apngTexture.getCurrentTextureSize();
         uv[0] = apngTexture.getCurrentTextureXOffset() / (float) currentTextureSize[0];
-        uv[1] = apngTexture.getCurrentTextureYOffset() / (float) currentTextureSize[1];
-        uv[2] = (apngTexture.getCurrentTextureXOffset() + apngTexture.getCurrentFrameWidth()) / (float) currentTextureSize[0];
+        uv[1] = (apngTexture.getCurrentTextureXOffset() + apngTexture.getCurrentFrameWidth()) / (float) currentTextureSize[0];
+        uv[2] = apngTexture.getCurrentTextureYOffset() / (float) currentTextureSize[1];
         uv[3] = (apngTexture.getCurrentTextureYOffset() + apngTexture.getCurrentFrameHeight()) / (float) currentTextureSize[1];
         return uv;
     }
