@@ -22,11 +22,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.file.Path;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefRenderElement.INDEX_TEXTURE_OFFSET;
 import static org.lwjgl.opengl.GL32C.*;
 
 public class StaticSTBHelper {
-    public static final int TEXTURE_UNIT = GL_TEXTURE0 + INDEX_TEXTURE_OFFSET;
 
     private StaticSTBHelper() {
         throw new AssertionError();
@@ -75,7 +73,7 @@ public class StaticSTBHelper {
      * The byte buffer will be freed.
      */
     public static void bindTexture(@Nullable ByteBuffer textureData, int textureId, int[] width, int[] height) {
-        glActiveTexture(TEXTURE_UNIT);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, textureId);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

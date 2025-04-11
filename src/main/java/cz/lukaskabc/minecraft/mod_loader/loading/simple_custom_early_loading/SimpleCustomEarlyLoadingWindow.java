@@ -2,7 +2,10 @@ package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.Config;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigLoader;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ElementType;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.ApngTextureElement;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StartupProgressBar;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StaticTextureElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefEarlyFrameBuffer;
 import net.minecraftforge.fml.earlydisplay.ColourScheme;
@@ -91,40 +94,40 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      */
     private void constructElements(final List<RenderElement> elements) {
         final SimpleFont font = accessor.getFont();
-//        final RenderElement anvil = elements.get(0);
-//        final RenderElement logMessageOverlay = elements.get(1);
-//        final RenderElement forgeVersionOverlay = elements.get(2);
-//        elements.clear();
-//
-//        Optional.ofNullable(configuration.getElements()).ifPresent(list -> {
-//            list.forEach(el -> {
-//                elements.add(new StaticTextureElement(el.getImage(), ElementType.ABSOLUTE.equals(el.getType()), el.getCoords()).get());
-//            });
-//        });
-//
-//        Optional.ofNullable(configuration.getProgressBar()).ifPresent(bar -> {
-//            elements.add(new StartupProgressBar(font, ElementType.ABSOLUTE.equals(bar.getType()), bar.getCoords()).get());
-//        });
-//
-//        // from forge early loading:
-//        if (configuration.isPerformanceBar()) {
-//            // top middle memory info
-//            elements.add(RenderElement.performanceBar(font));
-//        }
-//
-//        if (configuration.isAnvil()) {
-//            elements.add(anvil);
-//        }
-//
-//        if (configuration.isLogMessages()) {
-//            // bottom left log messages
-//            elements.add(logMessageOverlay);
-//        }
-//
-//        if (configuration.isForgeVersion()) {
-//            // bottom right game version
-//            elements.add(forgeVersionOverlay);
-//        }
+
+        Optional.ofNullable(configuration.getElements()).ifPresent(list -> {
+            list.forEach(el -> {
+                elements.add(new StaticTextureElement(el.getImage(), ElementType.ABSOLUTE.equals(el.getType()), el.getCoords()).get());
+            });
+        });
+
+        Optional.ofNullable(configuration.getProgressBar()).ifPresent(bar -> {
+            elements.add(new StartupProgressBar(font, ElementType.ABSOLUTE.equals(bar.getType()), bar.getCoords()).get());
+        });
+
+        // from forge early loading:
+        if (configuration.isPerformanceBar()) {
+            // top middle memory info
+            elements.add(RenderElement.performanceBar(font));
+        }
+
+        if (configuration.isAnvil()) {
+            elements.add(RenderElement.anvil(font));
+        }
+
+        if (configuration.isLogMessages()) {
+            // bottom left log messages
+            elements.add(RenderElement.logMessageOverlay(font));
+        }
+
+        if (configuration.isForgeVersion()) {
+            // bottom right game version
+            elements.add(RenderElement.forgeVersionOverlay(font, mcVersion + "-" + forgeVersion.split("-")[0]));
+        }
+
+        // TODO: debugging apng
+        elements.add(new ApngTextureElement("neoforge-two-foxes.apng",
+                true, new float[]{25, 565, 25, 409}).get());
     }
 
     /**

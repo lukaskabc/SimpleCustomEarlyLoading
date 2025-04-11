@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.stb.ApngSTBHelper.MAX_TEXTURE_SIZE;
-import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.stb.StaticSTBHelper.TEXTURE_UNIT;
+import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.stb.ApngSTBHelper.argbToRgba;
 import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;
@@ -134,7 +134,7 @@ public class ApngTexture {
 
         if (currentXOffset >= currentTextureSize[0]) {
             currentXOffset = 0;
-            currentYOffset += getCurrentFrameHeight();
+            currentYOffset += getTotalHeight();
         }
         if (currentYOffset >= currentTextureSize[1]) {
             currentYOffset = 0;
@@ -157,27 +157,30 @@ public class ApngTexture {
         }
     }
 
-    private void fillBuffer(ByteBuffer byteBuffer, int startingFrame, int nextStartingFrame, List<Argb8888BitmapSequence.Frame> frames) {
+    private void fillBuffer(ByteBuffer byteBuffer, int startingFrame, int nextStartingFrame, List<Argb8888BitmapSequence.Frame> frames, int textureWidth) {
+        int xOffset = 0;
+        int yOffset = 0;
         for (int frameIndex = startingFrame; frameIndex < nextStartingFrame; frameIndex++) {
-            final int[] data = frames.get(frameIndex).bitmap.array;
+            final int[] data = frames.get(frameIndex).bitmap.getPixelArray();
             final var control = frameControls[frameIndex];
             int x = 0;
-            int y = 0;
 
-            for (final int i : data) {
+            // skip to position for the frame
+            byteBuffer.position(yOffset * textureWidth * 4 + xOffset * 4);
+
+            for (int i : data) {
+                if (x == control.width()) {
+                    x = 0;
+                    byteBuffer.position(byteBuffer.position() + (textureWidth - control.width() - xOffset) * 4 + xOffset * 4);
+                }
+
+                byteBuffer.putInt(argbToRgba(i));
                 x++;
-                byteBuffer.putInt(i);
-                if (x >= control.width()) {
-                    x = 0;
-                    y++;
-                }
-                if (y >= control.height()) {
-                    x = 0;
-                    y = 0;
-                    final int toSkip = control.width() * (header.height - control.height());
-                    // skip to align with the apng height
-                    byteBuffer.position(byteBuffer.position() + toSkip);
-                }
+            }
+            xOffset += control.width();
+            if (xOffset >= textureWidth) {
+                xOffset = 0;
+                yOffset += header.height;
             }
         }
     }
@@ -186,7 +189,7 @@ public class ApngTexture {
      * Iterates the frames and uploads them to textures
      */
     public void uploadTextures(List<Argb8888BitmapSequence.Frame> frames) {
-        glActiveTexture(TEXTURE_UNIT);
+        glActiveTexture(GL_TEXTURE0);
 
         ByteBuffer byteBuffer = null;
 
@@ -224,7 +227,7 @@ public class ApngTexture {
 
             totalHeight += header.height; // add the last line height
             byteBuffer = ApngSTBHelper.reallocateWhenRequired(byteBuffer, totalHeight * totalWidth * 4); // times 4 as the int size a+r+g+b
-            fillBuffer(byteBuffer, startingFrame, nextStartingFrame, frames);
+            fillBuffer(byteBuffer, startingFrame, nextStartingFrame, frames, totalWidth);
 
             // prepare the buffer for reading
             byteBuffer.rewind();
@@ -232,17 +235,24 @@ public class ApngTexture {
             final int textureId = glGenTextures();
             // create the texture
             glBindTexture(GL_TEXTURE_2D, textureId);
+            checkGlError();
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, totalWidth, totalHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, byteBuffer);
+            checkGlError();
 
             textureIds.add(textureId);
             textureSizes.add(new int[]{totalWidth, totalHeight});
             startingFrame = nextStartingFrame;
         }
-
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    private void checkGlError() {
+        final int error = glGetError();
+        if (error != GL_NO_ERROR) {
+            throw new RuntimeException("OpenGL error: " + error);
+        }
     }
 
 }

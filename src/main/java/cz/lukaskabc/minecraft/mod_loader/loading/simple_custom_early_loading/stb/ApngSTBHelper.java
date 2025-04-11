@@ -27,10 +27,6 @@ public class ApngSTBHelper {
     }
 
     public static ApngTexture resolveAndBindApngTexture(String file, int size) throws FileNotFoundException, PngException {
-        int[] lw = new int[1];
-        int[] lh = new int[1];
-        int[] lc = new int[1];
-
         final InputStream inputStream = ConfigLoader.resolveFile(Path.of(file));
 
         final Argb8888BitmapSequence argbSequence = Png.readArgb8888BitmapSequence(inputStream);
@@ -38,8 +34,6 @@ public class ApngSTBHelper {
         if (!argbSequence.isAnimated()) {
             throw new ConfigurationException("APNG file is not animated: " + file);
         }
-
-        final int frameCount = argbSequence.getAnimationControl().numFrames;
 
         final ApngTexture apngTexture = new ApngTexture(argbSequence);
 
@@ -63,5 +57,17 @@ public class ApngSTBHelper {
             buffer = BufferUtils.createByteBuffer(requiredSize);
         }
         return buffer;
+    }
+
+    /**
+     * @see <a href="https://stackoverflow.com/a/61645451/12690791">StackOverflow</a>
+     */
+    public static int argbToRgba(int argb) {
+        // Source is in format: 0xAARRGGBB
+        return ((argb & 0x00FF0000) >> 16) | //______RR
+                ((argb & 0x0000FF00)) | //____GG__
+                ((argb & 0x000000FF) << 16) | //___BB____
+                ((argb & 0xFF000000));         //AA______
+        // Return value is in format:  0xAABBGGRR
     }
 }
