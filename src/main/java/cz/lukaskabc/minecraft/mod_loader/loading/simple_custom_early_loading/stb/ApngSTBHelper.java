@@ -37,6 +37,11 @@ public class ApngSTBHelper {
 
         final ApngTexture apngTexture = new ApngTexture(argbSequence);
 
+        if (apngTexture.getTotalHeight() >= MAX_TEXTURE_SIZE || apngTexture.getTotalWidth() >= MAX_TEXTURE_SIZE) {
+            LOG.error("APNG file {} reaches the maximum hardware texture size of {}x{}", file, MAX_TEXTURE_SIZE, MAX_TEXTURE_SIZE);
+            throw new ConfigurationException("APNG file is too big: " + file);
+        }
+
         apngTexture.uploadTextures(argbSequence.getAnimationFrames());
 
         return apngTexture;

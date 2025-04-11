@@ -17,6 +17,7 @@ import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_load
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 
 public class ApngTextureElement implements ElementSupplier {
+    public static final String[] SUPPORTED_EXTENSIONS = {".apng"};
     private static final int DEFAULT_TEXTURE_SIZE = 34881;
 
     private final ApngTexture apngTexture;

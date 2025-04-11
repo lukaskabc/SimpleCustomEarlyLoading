@@ -17,6 +17,7 @@ import static org.lwjgl.opengl.GL32C.GL_TEXTURE_2D;
  * Renders a single static texture.
  */
 public class StaticTextureElement implements ElementSupplier {
+    public static final String[] SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg"};
     public static final int COLOR = (255 << 24) | 0xFFFFFF;
     private static final int DEFAULT_TEXTURE_SIZE = 34881;
 

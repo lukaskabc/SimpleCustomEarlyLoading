@@ -2,6 +2,8 @@ package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.st
 
 import net.ellerton.japng.argb8888.Argb8888BitmapSequence;
 import net.ellerton.japng.chunks.PngHeader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;
 
 public class ApngTexture {
+    private static final Logger LOG = LogManager.getLogger();
     private final FrameControl[] frameControls;
     private final PngHeader header;
     /**
@@ -199,6 +202,9 @@ public class ApngTexture {
 
         // for each frame
         while (startingFrame < getFrameCount()) {
+            if (startingFrame > 0) {
+                LOG.warn("Creating new texture! APNG frames exceeds hardware maximum texture size of {}x{}. Consider using smaller size or less frames.", MAX_TEXTURE_SIZE, MAX_TEXTURE_SIZE);
+            }
 
             int lineWidth = 0;
             int totalWidth = 0;
@@ -212,7 +218,7 @@ public class ApngTexture {
                 if (newWidth >= MAX_TEXTURE_SIZE) {
                     // if we reached the max line width, check if we can make a new line
                     int newTotalHeight = totalHeight + header.height;
-                    if (newTotalHeight >= MAX_TEXTURE_SIZE) {
+                    if (newTotalHeight + header.height >= MAX_TEXTURE_SIZE) {
                         nextStartingFrame = frameIndex; // this frame was not included
                         break; // we can't fit the next frame
                     }
