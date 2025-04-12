@@ -1,4 +1,4 @@
-package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.stb;
+package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper;
 
 import net.ellerton.japng.argb8888.Argb8888BitmapSequence;
 import net.ellerton.japng.chunks.PngHeader;
@@ -9,8 +9,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.stb.ApngSTBHelper.MAX_TEXTURE_SIZE;
-import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.stb.ApngSTBHelper.argbToRgba;
+import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.ApngSTBHelper.MAX_TEXTURE_SIZE;
+import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.ApngSTBHelper.argbToRgba;
 import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;

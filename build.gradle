@@ -62,12 +62,25 @@ legacyForge {
             sourceSet(sourceSets.main)
         }
     }
+
+    unitTest {
+        enable()
+        testedMod = mods."${mod_id}"
+    }
 }
 
 dependencies {
     api("org.jspecify:jspecify:1.0.0")
     shade implementation("japng:api:0.5.1")
     clientAdditionalRuntimeClasspath("japng:api:0.5.1")
+
+    // test dependencies
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }

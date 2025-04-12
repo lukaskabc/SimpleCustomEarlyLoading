@@ -1,5 +1,7 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config;
 
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.element_anchor.ElementAnchor;
+
 /**
  * Represents the element position and size on the screen.
  */
@@ -7,13 +9,17 @@ public class ElementPosition {
     /**
      * Denotes the alignment of the element to the position defined by {@link #x} and {@link #y}.
      */
-    private Anchor positionAnchor = Anchor.CENTER;
+    private ElementAnchor positionAnchor = ElementAnchor.CENTER;
     /**
      * Unit for {@link #x} and {@link #y} values.
+     * <p>
+     * Percentage are relative to the window size.
      */
     private Unit positionUnit = Unit.PIXELS;
     /**
      * Unit for {@link #width} and {@link #height} values.
+     * <p>
+     * Percentage are relative to the window size.
      */
     private Unit sizeUnit = Unit.PIXELS;
     /**
@@ -44,6 +50,76 @@ public class ElementPosition {
      */
     public boolean hasWidth() {
         return Float.isFinite(width);
+    }
+
+    public void validate() {
+        if (!hasHeight() && !hasWidth()) {
+            throw new ConfigurationException("Element position must have either width or height set");
+        }
+    }
+
+    /**
+     * Returns the width of the element on the screen.
+     * If the width is not set, it is calculated based on the height and the aspect ratio of the element.
+     *
+     * @param elementTextureWidth  the width of the element texture
+     * @param elementTextureHeight the height of the element texture
+     * @return the width of the element on the screen
+     */
+    public int getSafeWidth(int elementTextureWidth, int elementTextureHeight) {
+        if (hasWidth()) {
+            return (int) width;
+        } else {
+            return (int) (elementTextureWidth * (height / elementTextureHeight));
+        }
+    }
+
+    public int getSafeHeight(int elementTextureWidth, int elementTextureHeight) {
+        if (hasHeight()) {
+            return (int) height;
+        } else {
+            return (int) (elementTextureHeight * (width / elementTextureWidth));
+        }
+    }
+
+    private void resolveSize(int elementWidth, int elementHeight, int screenWidth, int screenHeight, int[] output) {
+        assert output.length >= 4;
+
+        output[2] = getSafeWidth(elementWidth, elementHeight);
+        output[3] = getSafeHeight(elementWidth, elementHeight);
+        if (sizeUnit == Unit.PERCENTAGE) {
+            output[2] = getRelativeWidth(screenWidth, screenHeight);
+            output[3] = getRelativeHeight(screenWidth, screenHeight);
+        } else {
+            throw new ConfigurationException("Invalid size unit: " + sizeUnit);
+        }
+    }
+
+    /**
+     * Resolves the bounds of the element on the screen.
+     *
+     * @param elementWidth  the width of the element texture
+     * @param elementHeight the height of the element texture
+     * @param screenWidth   the width of the available screen
+     * @param screenHeight  the height of the available screen
+     * @return array of 4 integers (x0, y0, x1, y1) representing the bounds of the element on the screen
+     */
+    public int[] resolveBounds(int elementWidth, int elementHeight, int screenWidth, int screenHeight) {
+        validate();
+        int[] position = new int[4];
+
+        // the size of the element on the screen
+        resolveSize(elementWidth, elementHeight, screenWidth, screenHeight, position);
+
+        if (positionUnit == Unit.PERCENTAGE) {
+            position[0] = (int) (x * screenWidth / 100f);
+            position[1] = (int) (y * screenHeight / 100f);
+        } else {
+            position[0] = (int) x;
+            position[1] = (int) y;
+        }
+
+        return positionAnchor.apply(position[0], position[1], position[2], position[3]);
     }
 
     /**
@@ -103,11 +179,11 @@ public class ElementPosition {
         this.height = height;
     }
 
-    public Anchor getPositionAnchor() {
+    public ElementAnchor getPositionAnchor() {
         return positionAnchor;
     }
 
-    public void setPositionAnchor(Anchor positionAnchor) {
+    public void setPositionAnchor(ElementAnchor positionAnchor) {
         this.positionAnchor = positionAnchor;
     }
 
@@ -122,107 +198,5 @@ public class ElementPosition {
          * Allowed values: {@code 0 - 100}
          */
         PERCENTAGE,
-    }
-
-    public enum Anchor {
-        /**
-         * Anchor is in the top left corner of the screen.
-         * <pre><code>
-         * +-------------+
-         * |#            |
-         * |             |
-         * |             |
-         * +-------------+
-         * </code></pre>
-         */
-        TOP_LEFT,
-        /**
-         * Anchor is in the top right corner of the screen.
-         * <pre><code>
-         * +-------------+
-         * |            #|
-         * |             |
-         * |             |
-         * +-------------+
-         * </code></pre>
-         */
-        TOP_RIGHT,
-        /**
-         * Anchor is in the bottom left corner of the screen.
-         * <pre><code>
-         * +-------------+
-         * |             |
-         * |             |
-         * |#            |
-         * +-------------+
-         * </code></pre>
-         */
-        BOTTOM_LEFT,
-        /**
-         * Anchor is in the bottom right corner of the screen.
-         * <pre><code>
-         * +-------------+
-         * |             |
-         * |             |
-         * |            #|
-         * +-------------+
-         * </code></pre>
-         */
-        BOTTOM_RIGHT,
-        /**
-         * Anchor is in the center of the screen.
-         * <pre><code>
-         * +-------------+
-         * |             |
-         * |      #      |
-         * |             |
-         * +-------------+
-         * </code></pre>
-         */
-        CENTER,
-        /**
-         * Anchor is in the top center of the screen.
-         * <pre><code>
-         * +-------------+
-         * |      #      |
-         * |             |
-         * |             |
-         * +-------------+
-         * </code></pre>
-         */
-        TOP_CENTER,
-        /**
-         * Anchor is in the bottom center of the screen.
-         * <pre><code>
-         * +-------------+
-         * |             |
-         * |             |
-         * |      #      |
-         * +-------------+
-         * </code></pre>
-         */
-        BOTTOM_CENTER,
-        /**
-         * Anchor is in the left center of the screen.
-         * <pre><code>
-         * +-------------+
-         * |             |
-         * |#            |
-         * |             |
-         * +-------------+
-         * </code></pre>
-         */
-        LEFT_CENTER,
-        /**
-         * Anchor is in the right center of the screen.
-         * <pre><code>
-         * +-------------+
-         * |             |
-         * |            #|
-         * |             |
-         * +-------------+
-         * </code></pre>
-         */
-        RIGHT_CENTER,
     }
 }

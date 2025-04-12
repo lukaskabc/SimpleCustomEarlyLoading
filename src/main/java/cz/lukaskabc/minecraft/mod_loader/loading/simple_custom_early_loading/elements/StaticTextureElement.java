@@ -1,6 +1,7 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigurationException;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.StaticSTBHelper;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.CSB;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefRenderElement;
 import net.minecraftforge.fml.earlydisplay.ElementShader;

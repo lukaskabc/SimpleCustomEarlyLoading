@@ -1,9 +1,9 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigurationException;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.ApngSTBHelper;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.ApngTexture;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.CSB;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.stb.ApngSTBHelper;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.stb.ApngTexture;
 import net.ellerton.japng.error.PngException;
 import net.neoforged.fml.earlydisplay.ElementShader;
 import net.neoforged.fml.earlydisplay.QuadHelper;
