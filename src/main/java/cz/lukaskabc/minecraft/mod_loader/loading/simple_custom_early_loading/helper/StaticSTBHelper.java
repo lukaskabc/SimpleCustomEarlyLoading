@@ -6,7 +6,7 @@
  * Changes:
  * - Magnification filter to nearest
  */
-package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.stb;
+package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigLoader;
 import org.jspecify.annotations.Nullable;

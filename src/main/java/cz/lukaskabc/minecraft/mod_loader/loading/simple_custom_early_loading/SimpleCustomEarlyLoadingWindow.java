@@ -5,7 +5,6 @@ import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.con
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ElementType;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.ApngTextureElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StartupProgressBar;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StaticTextureElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefEarlyFrameBuffer;
 import net.neoforged.fml.earlydisplay.ColourScheme;
@@ -94,11 +93,12 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
     private void constructElements(String mcVersion, String forgeVersion, final List<RenderElement> elements) {
         final SimpleFont font = accessor.getFont();
 
-        Optional.ofNullable(configuration.getElements()).ifPresent(list -> {
-            list.forEach(el -> {
-                elements.add(new StaticTextureElement(el.getImage(), ElementType.ABSOLUTE.equals(el.getType()), el.getCoords()).get());
-            });
-        });
+        // TODO
+//        Optional.ofNullable(configuration.getElements()).ifPresent(list -> {
+//            list.forEach(el -> {
+//                elements.add(new StaticTextureElement(el.getImage(), ElementType.ABSOLUTE.equals(el.getType()), el.getCoords()).get());
+//            });
+//        });
 
         Optional.ofNullable(configuration.getProgressBar()).ifPresent(bar -> {
             elements.add(new StartupProgressBar(font, ElementType.ABSOLUTE.equals(bar.getType()), bar.getCoords()).get());

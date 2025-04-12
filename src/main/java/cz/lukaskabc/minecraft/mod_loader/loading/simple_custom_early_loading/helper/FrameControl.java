@@ -1,4 +1,4 @@
-package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.stb;
+package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper;
 
 import net.ellerton.japng.chunks.PngFrameControl;
 

@@ -1,8 +1,8 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigurationException;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.StaticSTBHelper;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.CSB;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.stb.StaticSTBHelper;
 import net.neoforged.fml.earlydisplay.ElementShader;
 import net.neoforged.fml.earlydisplay.QuadHelper;
 import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
