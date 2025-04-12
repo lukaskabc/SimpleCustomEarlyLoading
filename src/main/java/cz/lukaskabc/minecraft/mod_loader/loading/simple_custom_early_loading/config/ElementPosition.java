@@ -70,7 +70,7 @@ public class ElementPosition {
         if (hasWidth()) {
             return (int) width;
         } else {
-            return (int) (elementTextureWidth * (height / elementTextureHeight));
+            return (int) (height * elementTextureWidth / elementTextureHeight);
         }
     }
 
@@ -78,7 +78,23 @@ public class ElementPosition {
         if (hasHeight()) {
             return (int) height;
         } else {
-            return (int) (elementTextureHeight * (width / elementTextureWidth));
+            return (int) (width * elementTextureHeight / elementTextureWidth);
+        }
+    }
+
+    public int getRelativeWidth(int elementTextureWidth, int elementTextureHeight, int screenWidth) {
+        if (hasWidth()) {
+            return (int) (width * screenWidth / 100f);
+        } else {
+            return Math.round(height * elementTextureWidth / elementTextureHeight * screenWidth / 100f);
+        }
+    }
+
+    public int getRelativeHeight(int elementTextureWidth, int elementTextureHeight, int screenHeight) {
+        if (hasHeight()) {
+            return (int) (height * screenHeight / 100f);
+        } else {
+            return Math.round(width * elementTextureHeight / elementTextureWidth * screenHeight / 100f);
         }
     }
 
@@ -88,9 +104,9 @@ public class ElementPosition {
         output[2] = getSafeWidth(elementWidth, elementHeight);
         output[3] = getSafeHeight(elementWidth, elementHeight);
         if (sizeUnit == Unit.PERCENTAGE) {
-            output[2] = getRelativeWidth(screenWidth, screenHeight);
-            output[3] = getRelativeHeight(screenWidth, screenHeight);
-        } else {
+            output[2] = getRelativeWidth(elementWidth, elementHeight, screenWidth);
+            output[3] = getRelativeHeight(elementWidth, elementHeight, screenHeight);
+        } else if (sizeUnit != Unit.PIXELS) {
             throw new ConfigurationException("Invalid size unit: " + sizeUnit);
         }
     }

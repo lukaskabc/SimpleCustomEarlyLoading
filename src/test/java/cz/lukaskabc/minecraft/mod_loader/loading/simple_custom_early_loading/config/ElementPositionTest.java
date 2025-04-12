@@ -1,12 +1,32 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config;
 
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.element_anchor.ElementAnchor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ElementPositionTest {
+    private static final int imageTextureWidth = 654;
+    private static final int imageTextureHeight = 152;
+    private static final int windowWidth = 1920;
+    private static final int windowHeight = 1080;
+    private static final float widthPercentage = 50;
+    private static final float heightPercentage = 11.62079f;
+    private static final float expectedHeight = windowHeight / 100f * heightPercentage;
+    private static final float expectedWidth = windowWidth / 100f * widthPercentage;
+
     private ElementPosition position;
+
+    /*
+    An example
+    The image size is 654x152 pixels.
+    Assuming the window size is FullHD 1920x1080,
+    */
+
+    private static void assertFloatTolerance(float expected, float actual) {
+        assertEquals(expected, actual, 0.6f); // yes, this is a lot of tolerance TODO accuracy
+    }
 
     @BeforeEach
     void beforeEach() {
@@ -15,21 +35,16 @@ class ElementPositionTest {
 
     @Test
     void getSafeWidthReturnsWidthWhenSet() {
-        final float width = 5f;
+        final float width = 33;
         position.setWidth(width);
 
-        assertEquals(width, position.getSafeWidth(3, 2));
+        assertFloatTolerance(width, position.getSafeWidth(imageTextureWidth, imageTextureHeight));
     }
 
     @Test
     void getSafeWidthCalculatesWidthWhenNotSet() {
-        final float height = 4f;
-        final int elementWidth = 3;
-        final int elementHeight = 2;
-        position.setHeight(height);
-
-        // the width is doubled since the desired height is twice the element height
-        assertEquals(elementWidth * 2, position.getSafeWidth(elementWidth, elementHeight));
+        position.setHeight(imageTextureHeight);
+        assertFloatTolerance(imageTextureWidth, position.getSafeWidth(imageTextureWidth, imageTextureHeight));
     }
 
     @Test
@@ -37,35 +52,54 @@ class ElementPositionTest {
         final float height = 6f;
         position.setHeight(height);
 
-        assertEquals(height, position.getSafeHeight(3, 2));
+        assertEquals(height, position.getSafeHeight(imageTextureWidth, imageTextureHeight));
     }
 
     @Test
     void getSafeHeightCalculatesHeightWhenNotSet() {
-        final float width = 1.5f;
-        final int elementWidth = 3;
-        final int elementHeight = 2;
-        position.setWidth(width);
-
-        // the height is halved since the desired width is half the element width
-        assertEquals(elementHeight / 2, position.getSafeHeight(elementWidth, elementHeight));
+        position.setWidth(imageTextureWidth);
+        assertFloatTolerance(imageTextureHeight, position.getSafeHeight(imageTextureWidth, imageTextureHeight));
     }
 
     @Test
-    void getRelativeWidthReturnsPercentageWidthWhenWidthIsSet() {
-        
-    }
-
-
-    @Test
-    void getRelativeWidth() {
+    void getRelativeWidthReturnsRelativeWidthWhenSet() {
+        position.setWidth(widthPercentage);
+        assertFloatTolerance(expectedWidth, position.getRelativeWidth(imageTextureWidth, imageTextureHeight, windowWidth));
     }
 
     @Test
-    void getRelativeHeight() {
+    void getRelativeWidthCalculatesRelativeWidthWhenNotSet() {
+        final float expectedWidth = windowWidth / 100f * widthPercentage;
+        position.setHeight(heightPercentage);
+        assertFloatTolerance(expectedWidth, position.getRelativeWidth(imageTextureWidth, imageTextureHeight, windowWidth));
     }
 
     @Test
-    void resolveBounds() {
+    void getRelativeHeightReturnsRelativeHeightWhenSet() {
+        position.setHeight(heightPercentage);
+        assertFloatTolerance(expectedHeight, position.getRelativeHeight(imageTextureWidth, imageTextureHeight, windowHeight));
+    }
+
+    @Test
+    void getRelativeHeightCalculatesRelativeHeightWhenNotSet() {
+        position.setWidth(widthPercentage);
+        assertFloatTolerance(expectedHeight, position.getRelativeHeight(imageTextureWidth, imageTextureHeight, windowHeight));
+    }
+
+    @Test
+    void resolveBoundsReturnsCorrectBoundsForTopLeftAnchor() {
+        position.setPositionAnchor(ElementAnchor.TOP_LEFT);
+        position.setX(0);
+        position.setY(0);
+        position.setSizeUnit(ElementPosition.Unit.PERCENTAGE);
+        position.setWidth(widthPercentage);
+        position.setHeight(heightPercentage);
+
+        final int[] bounds = position.resolveBounds(imageTextureWidth, imageTextureHeight, windowWidth, windowHeight);
+
+        assertFloatTolerance(0, bounds[0]);
+        assertFloatTolerance(0, bounds[1]);
+        assertFloatTolerance(expectedWidth, bounds[2]);
+        assertFloatTolerance(expectedHeight, bounds[3]);
     }
 }
