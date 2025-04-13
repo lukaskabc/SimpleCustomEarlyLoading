@@ -1,5 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements;
 
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.BoundsResolver;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigurationException;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.StaticSTBHelper;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.CSB;
@@ -12,6 +13,7 @@ import org.jline.utils.Log;
 import org.lwjgl.opengl.GL32C;
 
 import java.io.FileNotFoundException;
+import java.util.Set;
 
 import static org.lwjgl.opengl.GL32C.GL_TEXTURE_2D;
 
@@ -19,44 +21,46 @@ import static org.lwjgl.opengl.GL32C.GL_TEXTURE_2D;
  * Renders a single static texture.
  */
 public class StaticTextureElement implements ElementSupplier {
-    public static final String[] SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg"};
+    public static final Set<String> SUPPORTED_EXTENSIONS = Set.of(
+            "jpg", "jpeg",
+            "png",
+            "tga",
+            "bmp",
+            "psd",
+            "gif",
+            "hdr",
+            "pic",
+            "pnm"
+    );
+
     public static final int COLOR = (255 << 24) | 0xFFFFFF;
     private static final int DEFAULT_TEXTURE_SIZE = 34881;
 
+    private final int[] textureSize;
     private final int textureId;
-    private final boolean absolute;
-    private final float[] coords;
+    private final BoundsResolver boundsResolver;
 
-    public StaticTextureElement(String texture, boolean absolute, float[] coords) {
-        this.coords = coords;
-        this.absolute = absolute;
+    public StaticTextureElement(String texture, BoundsResolver boundsResolver) {
+        final int[] textureWidth = new int[1];
+        final int[] textureHeight = new int[1];
+        this.boundsResolver = boundsResolver;
         try {
-            textureId = StaticSTBHelper.resolveAndBindTexture(texture, DEFAULT_TEXTURE_SIZE);
+            textureId = StaticSTBHelper.resolveAndBindTexture(texture, DEFAULT_TEXTURE_SIZE, textureWidth, textureHeight);
         } catch (FileNotFoundException e) {
             Log.error("Failed to load texture: ", e.getMessage());
             throw new ConfigurationException(e);
         }
-    }
-
-    public static float[] relativeCoords(float[] coords, CSB csb) {
-        final float width = csb.ctx().scaledWidth() / 100f;
-        final float height = csb.ctx().scaledHeight() / 100f;
-        return new float[]{
-                coords[0] * width,
-                coords[1] * width,
-                coords[2] * height,
-                coords[3] * height
-        };
+        this.textureSize = new int[]{textureWidth[0], textureHeight[0]};
     }
 
     @Override
     public void render(CSB csb, int frame) {
-        final float[] coords = absolute ? this.coords : relativeCoords(this.coords, csb);
+        final int[] bounds = boundsResolver.resolveBounds(textureSize[0], textureSize[1], csb.ctx().scaledWidth(), csb.ctx().scaledHeight());
         csb.ctx().elementShader().updateTextureUniform(0);
         csb.ctx().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
         GL32C.glBindTexture(GL_TEXTURE_2D, textureId);
         csb.buffer().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
-        QuadHelper.loadQuad(csb.buffer(), coords[0], coords[1], coords[2], coords[3], 0f, 1f, 0f, 1f, COLOR);
+        QuadHelper.loadQuad(csb.buffer(), bounds[0], bounds[1], bounds[2], bounds[3], 0f, 1f, 0f, 1f, COLOR);
         csb.buffer().draw();
         GL32C.glBindTexture(GL_TEXTURE_2D, 0);
     }

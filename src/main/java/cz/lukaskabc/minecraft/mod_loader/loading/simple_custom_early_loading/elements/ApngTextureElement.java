@@ -1,5 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements;
 
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.BoundsResolver;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigurationException;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.ApngSTBHelper;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.ApngTexture;
@@ -12,21 +13,20 @@ import org.jline.utils.Log;
 import org.lwjgl.opengl.GL32C;
 
 import java.io.FileNotFoundException;
+import java.util.Set;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StaticTextureElement.COLOR;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 
 public class ApngTextureElement implements ElementSupplier {
-    public static final String[] SUPPORTED_EXTENSIONS = {".apng"};
+    public static final Set<String> SUPPORTED_EXTENSIONS = Set.of("apng");
     private static final int DEFAULT_TEXTURE_SIZE = 34881;
 
     private final ApngTexture apngTexture;
-    private final boolean absolute;
-    private final float[] coords;
+    private final BoundsResolver boundsResolver;
 
-    public ApngTextureElement(String texture, boolean absolute, float[] coords) {
-        this.coords = coords;
-        this.absolute = absolute;
+    public ApngTextureElement(String texture, BoundsResolver boundsResolver) {
+        this.boundsResolver = boundsResolver;
         try {
             apngTexture = ApngSTBHelper.resolveAndBindApngTexture(texture, DEFAULT_TEXTURE_SIZE);
         } catch (FileNotFoundException | PngException e) {
@@ -37,13 +37,13 @@ public class ApngTextureElement implements ElementSupplier {
 
     @Override
     public void render(CSB csb, int frame) {
-        final float[] coords = absolute ? this.coords : StaticTextureElement.relativeCoords(this.coords, csb);
+        final int[] bounds = boundsResolver.resolveBounds(apngTexture.getTotalWidth(), apngTexture.getTotalHeight(), csb.ctx().scaledWidth(), csb.ctx().scaledHeight());
         final float[] uvs = getUV();
         csb.ctx().elementShader().updateTextureUniform(0);
         csb.ctx().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
         GL32C.glBindTexture(GL_TEXTURE_2D, apngTexture.getCurrentTextureId());
         csb.buffer().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
-        QuadHelper.loadQuad(csb.buffer(), coords[0], coords[1], coords[2], coords[3], uvs[0], uvs[1], uvs[2], uvs[3], COLOR);
+        QuadHelper.loadQuad(csb.buffer(), bounds[0], bounds[1], bounds[2], bounds[3], uvs[0], uvs[1], uvs[2], uvs[3], COLOR);
         csb.buffer().draw();
         GL32C.glBindTexture(GL_TEXTURE_2D, 0);
         apngTexture.nextFrame();
