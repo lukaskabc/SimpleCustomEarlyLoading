@@ -60,6 +60,9 @@ jobs:
         run: |
           sed -i "s/^mod_version=.*/mod_version=${{ env.TAG }}/" gradle.properties
 
+      - name: Run tests
+        run: ./gradlew test
+
       - name: Build Release
         run: ./gradlew build
 
