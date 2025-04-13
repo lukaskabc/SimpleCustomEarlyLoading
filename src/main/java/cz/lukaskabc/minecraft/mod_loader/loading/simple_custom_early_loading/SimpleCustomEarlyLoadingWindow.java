@@ -1,10 +1,9 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.Config;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigLoader;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ElementType;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.*;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.ApngTextureElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StartupProgressBar;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StaticTextureElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefEarlyFrameBuffer;
 import net.neoforged.fml.earlydisplay.ColourScheme;
@@ -24,6 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
@@ -83,6 +83,17 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         }
     }
 
+    private Supplier<RenderElement> constructElement(Element element) {
+        // yes, sure, I could use abstract factories, but lets keep it simple
+        if (ApngTextureElement.SUPPORTED_EXTENSIONS.contains(element.getExtension())) {
+            return new ApngTextureElement(element.getImage(), element.getPosition());
+        }
+        if (StaticTextureElement.SUPPORTED_EXTENSIONS.contains(element.getExtension())) {
+            return new StaticTextureElement(element.getImage(), element.getPosition());
+        }
+        throw new ConfigurationException("Unsupported image extension: " + element.getExtension());
+    }
+
     /**
      * Constructs the elements to be rendered in the loading window.
      *
@@ -93,12 +104,11 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
     private void constructElements(String mcVersion, String forgeVersion, final List<RenderElement> elements) {
         final SimpleFont font = accessor.getFont();
 
-        // TODO
-//        Optional.ofNullable(configuration.getElements()).ifPresent(list -> {
-//            list.forEach(el -> {
-//                elements.add(new StaticTextureElement(el.getImage(), ElementType.ABSOLUTE.equals(el.getType()), el.getCoords()).get());
-//            });
-//        });
+        Optional.ofNullable(configuration.getElements()).ifPresent(list -> {
+            list.forEach(el ->
+                    elements.add(constructElement(el).get())
+            );
+        });
 
         Optional.ofNullable(configuration.getProgressBar()).ifPresent(bar -> {
             elements.add(new StartupProgressBar(font, ElementType.ABSOLUTE.equals(bar.getType()), bar.getCoords()).get());
@@ -123,10 +133,6 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
             // bottom right game version
             elements.add(RenderElement.forgeVersionOverlay(font, mcVersion + "-" + forgeVersion.split("-")[0]));
         }
-
-        // TODO: debugging apng
-        elements.add(new ApngTextureElement("neoforge-two-foxes.apng",
-                true, new float[]{25, 565, 25, 409}).get());
     }
 
     /**

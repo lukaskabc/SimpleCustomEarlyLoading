@@ -54,17 +54,15 @@ public class StaticSTBHelper {
     /**
      * @return textureId
      */
-    public static int resolveAndBindTexture(String file, int size) throws FileNotFoundException {
-        int[] lw = new int[1];
-        int[] lh = new int[1];
+    public static int resolveAndBindTexture(String file, int size, int[] textureWidth, int[] textureHeight) throws FileNotFoundException {
         int[] lc = new int[1];
 
         final InputStream inputStream = ConfigLoader.resolveFile(Path.of(file));
         ByteBuffer buf = readToBuffer(inputStream, size);
-        final ByteBuffer img = STBImage.stbi_load_from_memory(buf, lw, lh, lc, 4);
+        final ByteBuffer img = STBImage.stbi_load_from_memory(buf, textureWidth, textureHeight, lc, 4);
 
         int texid = glGenTextures();
-        bindTexture(img, texid, lw, lh);
+        bindTexture(img, texid, textureWidth, textureHeight);
 
         return texid;
     }

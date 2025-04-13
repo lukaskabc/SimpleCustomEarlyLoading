@@ -12,18 +12,35 @@ See forge version description: [Releases](https://github.com/lukaskabc/SimpleCus
 
 ![Preview](./preview.png)
 
-Only static images are supported.  
 Currently, the window is not able to dynamically change its resolution when the window is resized.  
 I won't allow removing the Mojang logo.
 
 ## Features:
 
-- add and position **custom images** (png)
+- add and position **custom images** (see [supported image formats](#supported-image-formats))
 - toggle and change the position of the progress bar
 - toggle performance bar
 - toggle NeoForge's fox
 - toggle bottom left log
 - toggle NeoForge's version (bottom right)
+
+## Supported image formats:
+
+**Animated images:**
+
+- APNG
+
+**Static images:**
+
+- JPEG baseline & progressive (12 bpc/arithmetic not supported, same as stock IJG lib
+- PNG 1/2/4/8/16-bit-per-channel
+- TGA (not sure what subset, if a subset)
+- BMP non-1bpp, non-RLE
+- PSD (composited view only, no extra channels, 8/16 bit-per-channel)
+- GIF (renders only single static frame, use APNG instead)
+- HDR (radiance rgbE format)
+- PIC (Softimage PIC)
+- PNM (PPM and PGM binary only)
 
 ## Installation - NeoForge:
 
@@ -48,13 +65,13 @@ earlyWindowMaximized = true
 earlyWindowProvider = "fmlearlywindow"
 ```
 
-3. Optional: update `options.txt`: `darkMojangStudiosBackground:true`
-
 Unfortunately, the override is applied quite late,
 which may result in the original red early loading (or a white screen) to "flash" on the very game start.
 I can't do anything about that.
 
-However, the red color of the original loading can be changed using `darkMojangStudiosBackground:true` in `options.txt`.
+However, the red color of the original loading can be changed to black using
+
+3. Optional: update `options.txt` file: `darkMojangStudiosBackground:true`
 
 ## Configuration:
 
@@ -94,7 +111,8 @@ see [implementation description of StargateEarlyLoading](https://github.com/luka
 # Copyright
 
 Japng © Copyright A. Ellerton.  
-Japng is licensed under Apache-2.0.
+Japng is licensed under Apache-2.0.  
+[Japng GitHub repository](https://github.com/aellerton/japng)
 ___
 
 NOT AN OFFICIAL MINECRAFT PRODUCT/SERVICE/MOD. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT
