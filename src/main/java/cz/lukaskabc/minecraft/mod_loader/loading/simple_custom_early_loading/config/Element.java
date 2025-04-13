@@ -12,7 +12,7 @@ public class Element {
         if (index == -1) {
             throw new ConfigurationException("No extension specified for file " + image);
         }
-        return image.substring(index);
+        return image.substring(index + 1);
     }
 
     public String getImage() {

@@ -1,5 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config;
 
+import com.google.gson.annotations.SerializedName;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.element_anchor.ElementAnchor;
 
 /**
@@ -199,12 +200,14 @@ public class ElementPosition implements BoundsResolver {
         /**
          * Absolute size in pixels on the screen.
          */
+        @SerializedName(value = "PIXELS", alternate = {"pixels", "PIXEL", "pixel", "PX", "px"})
         PIXELS,
         /**
          * Percentage of the window size.
          * <p>
          * Allowed values: {@code 0 - 100}
          */
+        @SerializedName(value = "PERCENTAGE", alternate = {"percentage", "PERCENT", "percent", "%"})
         PERCENTAGE,
     }
 }
