@@ -43,7 +43,7 @@ public class ApngTextureElement implements ElementSupplier {
         csb.ctx().elementShader().updateRenderTypeUniform(ElementShader.RenderType.TEXTURE);
         GL32C.glBindTexture(GL_TEXTURE_2D, apngTexture.getCurrentTextureId());
         csb.buffer().begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
-        QuadHelper.loadQuad(csb.buffer(), bounds[0], bounds[1], bounds[2], bounds[3], uvs[0], uvs[1], uvs[2], uvs[3], COLOR);
+        QuadHelper.loadQuad(csb.buffer(), bounds[0], bounds[2], bounds[1], bounds[3], uvs[0], uvs[1], uvs[2], uvs[3], COLOR);
         csb.buffer().draw();
         GL32C.glBindTexture(GL_TEXTURE_2D, 0);
         apngTexture.nextFrame();

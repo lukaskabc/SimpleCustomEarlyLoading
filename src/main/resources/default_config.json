@@ -1,33 +1,49 @@
+// Check documentation for more information with examples
+// https://github.com/lukaskabc/SimpleCustomEarlyLoading#configuration
 {
   "elements": [
-    // note that order matters - elements are rendered from top to bottom+
-    // gifs are not supported
+    // note that order matters - elements are rendered from top to bottom
     {
       // example background
       "image": "stellarview.png",
-      "type": "percentage",
-      "x1": 0,
-      "x2": 100,
-      "y1": 0,
-      "y2": 100
+      "position": {
+        // define which point in the image should be aligned at x, y position on the window
+        // Possible values: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER, TOP_CENTER, BOTTOM_CENTER, LEFT_CENTER, RIGHT_CENTER
+        "position_anchor": "CENTER",
+        // The unit for x, y position PIXELS or PERCENTAGE (percentage of the window values: 0-100)
+        "position_unit": "PERCENTAGE",
+        // The position of the anchor on the screen in positionUnit
+        "x": 50,
+        "y": 50,
+        // The unit for width, height - PIXELS or PERCENTAGE (again, percantage of the window)
+        "size_unit": "PERCENTAGE",
+        // The width and height of the image in sizeUnit
+        // if you specify both values, the aspect ratio is not preserved
+        // if you specify only one value, the other is calculated to preserve the aspect ratio
+        "height": 100
+        // "width": 100
+      }
     },
     {
+      // the loading text should be centered and poistioned at 60% from the top of the window
       "image": "loading.png",
-      // type: absolute / percentage
-      "type": "percentage",
-      // place loading image somewhere between mojang logo and progress bar
-      "x1": 37.225,
-      "x2": 62.775,
-      "y1": 55,
-      "y2": 65.55
+      "position": {
+        "position_anchor": "CENTER",
+        "position_unit": "PERCENTAGE",
+        "x": 50,
+        "y": 60,
+        "size_unit": "PERCENTAGE",
+        // the loading text should be 25% of the window width
+        "width": 25
+      }
     }
   ],
   // "progress_bar": null to remove the default element
   "progress_bar": {
-    "type": "percentage",
-    // The coords of the bar center
-    "x": 50,
-    "y": 70
+    //    "type": "percentage",
+    //    // The coords of the bar center
+    //    "x": 50,
+    //    "y": 70
   },
   "performance_bar": true,
   "fox": true,
