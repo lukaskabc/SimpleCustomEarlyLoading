@@ -4,7 +4,7 @@ import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.con
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ElementPositionTest {
     private static final int imageTextureWidth = 654;
@@ -101,5 +101,29 @@ class ElementPositionTest {
         assertFloatTolerance(0, bounds[1]);
         assertFloatTolerance(expectedWidth, bounds[2]);
         assertFloatTolerance(expectedHeight, bounds[3]);
+    }
+
+    @Test
+    void resolveBoundsThrowsWhenNeitherSizeIsSet() {
+        assertThrows(ConfigurationException.class, () -> position.resolveBounds(imageTextureWidth, imageTextureHeight, windowWidth, windowHeight));
+    }
+
+    @Test
+    void resolveBoundsDoesNotThrowWhenOnlyWidthIsSet() {
+        position.setWidth(widthPercentage);
+        assertDoesNotThrow(() -> position.resolveBounds(imageTextureWidth, imageTextureHeight, windowWidth, windowHeight));
+    }
+
+    @Test
+    void resolveBoundsDoesNotThrowWhenOnlyHeightIsSet() {
+        position.setHeight(heightPercentage);
+        assertDoesNotThrow(() -> position.resolveBounds(imageTextureWidth, imageTextureHeight, windowWidth, windowHeight));
+    }
+
+    @Test
+    void resolveBoundsDoesNotThrowWHenBothWidthAndHeightAreSet() {
+        position.setWidth(widthPercentage);
+        position.setHeight(heightPercentage);
+        assertDoesNotThrow(() -> position.resolveBounds(imageTextureWidth, imageTextureHeight, windowWidth, windowHeight));
     }
 }
