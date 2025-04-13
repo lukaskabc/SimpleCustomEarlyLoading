@@ -83,19 +83,20 @@ public class ElementPosition implements BoundsResolver {
         }
     }
 
-    public int getRelativeWidth(int elementTextureWidth, int elementTextureHeight, int screenWidth) {
+    public int getRelativeWidth(int elementTextureWidth, int elementTextureHeight, int screenWidth, int screenHeight) {
         if (hasWidth()) {
+            // The 'width' field is interpreted as a percentage relative to the screen width.
             return (int) (width * screenWidth / 100f);
         } else {
-            return Math.round(height * elementTextureWidth / elementTextureHeight * screenWidth / 100f);
+            return Math.round((height * screenHeight / 100f) * (elementTextureWidth / (float) elementTextureHeight));
         }
     }
 
-    public int getRelativeHeight(int elementTextureWidth, int elementTextureHeight, int screenHeight) {
+    public int getRelativeHeight(int elementTextureWidth, int elementTextureHeight, int screenWidth, int screenHeight) {
         if (hasHeight()) {
             return (int) (height * screenHeight / 100f);
         } else {
-            return Math.round(width * elementTextureHeight / elementTextureWidth * screenHeight / 100f);
+            return Math.round((width * screenWidth / 100f) * (elementTextureHeight / (float) elementTextureWidth));
         }
     }
 
@@ -105,8 +106,8 @@ public class ElementPosition implements BoundsResolver {
         output[2] = getSafeWidth(elementWidth, elementHeight);
         output[3] = getSafeHeight(elementWidth, elementHeight);
         if (sizeUnit == Unit.PERCENTAGE) {
-            output[2] = getRelativeWidth(elementWidth, elementHeight, screenWidth);
-            output[3] = getRelativeHeight(elementWidth, elementHeight, screenHeight);
+            output[2] = getRelativeWidth(elementWidth, elementHeight, screenWidth, screenHeight);
+            output[3] = getRelativeHeight(elementWidth, elementHeight, screenWidth, screenHeight);
         } else if (sizeUnit != Unit.PIXELS) {
             throw new ConfigurationException("Invalid size unit: " + sizeUnit);
         }

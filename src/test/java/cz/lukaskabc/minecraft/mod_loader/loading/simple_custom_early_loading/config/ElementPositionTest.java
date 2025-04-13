@@ -64,26 +64,43 @@ class ElementPositionTest {
     @Test
     void getRelativeWidthReturnsRelativeWidthWhenSet() {
         position.setWidth(widthPercentage);
-        assertFloatTolerance(expectedWidth, position.getRelativeWidth(imageTextureWidth, imageTextureHeight, windowWidth));
+        assertFloatTolerance(expectedWidth, position.getRelativeWidth(imageTextureWidth, imageTextureHeight, windowWidth, windowHeight));
     }
 
     @Test
     void getRelativeWidthCalculatesRelativeWidthWhenNotSet() {
-        final float expectedWidth = windowWidth / 100f * widthPercentage;
+        // Only height (as percentage) is set; width is not set.
         position.setHeight(heightPercentage);
-        assertFloatTolerance(expectedWidth, position.getRelativeWidth(imageTextureWidth, imageTextureHeight, windowWidth));
+
+        // Convert the height percentage to pixels.
+        float pixelHeight = (heightPercentage * windowHeight / 100f);
+        // Derive the pixel width from the texture aspect ratio.
+        float expectedDerivedWidth = pixelHeight * ((float) imageTextureWidth / imageTextureHeight);
+
+        int computedWidth = position.getRelativeWidth(imageTextureWidth, imageTextureHeight, windowWidth, windowHeight);
+
+        assertFloatTolerance(expectedDerivedWidth, computedWidth);
     }
 
     @Test
     void getRelativeHeightReturnsRelativeHeightWhenSet() {
         position.setHeight(heightPercentage);
-        assertFloatTolerance(expectedHeight, position.getRelativeHeight(imageTextureWidth, imageTextureHeight, windowHeight));
+        assertFloatTolerance(expectedHeight, position.getRelativeHeight(imageTextureWidth, imageTextureHeight, windowWidth, windowHeight));
     }
 
     @Test
     void getRelativeHeightCalculatesRelativeHeightWhenNotSet() {
+        // Only width (as percentage) is set; height is not set.
         position.setWidth(widthPercentage);
-        assertFloatTolerance(expectedHeight, position.getRelativeHeight(imageTextureWidth, imageTextureHeight, windowHeight));
+
+        // Convert the width percentage to pixels.
+        float pixelWidth = (widthPercentage * windowWidth / 100f);
+        // Derive the pixel height from the texture aspect ratio.
+        float expectedDerivedHeight = pixelWidth * ((float) imageTextureHeight / imageTextureWidth);
+
+        int computedHeight = position.getRelativeHeight(imageTextureWidth, imageTextureHeight, windowWidth, windowHeight);
+
+        assertFloatTolerance(expectedDerivedHeight, computedHeight);
     }
 
     @Test
