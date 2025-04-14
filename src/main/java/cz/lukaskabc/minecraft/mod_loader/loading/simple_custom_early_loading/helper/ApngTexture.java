@@ -107,6 +107,10 @@ public class ApngTexture {
         return currentYOffset;
     }
 
+    public float getCurrentDelay() {
+        return frameControls[currentFrame].delay();
+    }
+
     /**
      * Transition to the next play if it is not the last one.
      * Resets the current frame to 0 if infinity looping is enabled
