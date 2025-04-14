@@ -21,7 +21,7 @@ public class ProgressBar {
         fontTextureId = fontAccessor.textureNumber();
     }
 
-    public static TextureRenderer progressBar(BarPosition position, ColorFunction colourFunction, ProgressDisplay progressDisplay) {
+    public static TextureRenderer progressBar(int[] position, ColorFunction colourFunction, ProgressDisplay progressDisplay) {
         return (csb, frame) -> {
             final RenderElement.DisplayContext context = csb.ctx();
             final SimpleBufferBuilder bb = csb.buffer();
@@ -33,21 +33,23 @@ public class ProgressBar {
             var progress = progressDisplay.progress(frame);
             bb.begin(SimpleBufferBuilder.Format.POS_TEX_COLOR, SimpleBufferBuilder.Mode.QUADS);
             var inset = 2;
-            var pos = position.location(context);
-            var x0 = pos[0];
-            var x1 = pos[0] + pos[2] + 4 * inset;
-            var y0 = pos[1];
-            var y1 = y0 + BAR_HEIGHT;
+            var x0 = position[0];
+            var x1 = position[2] + 4 * inset;
+            var y0 = position[1];
+            var y1 = position[3];
+            // bar border
             QuadHelper.loadQuad(bb, x0, x1, y0, y1, 0f, 0f, 0f, 0f, context.colourScheme().foreground().packedint(alpha));
 
             x0 += inset;
             x1 -= inset;
             y0 += inset;
             y1 -= inset;
+            // bar backrgound
             QuadHelper.loadQuad(bb, x0, x1, y0, y1, 0f, 0f, 0f, 0f, context.colourScheme().background().packedint(getGlobalAlpha()));
 
-            x1 = x0 + inset + (int) (progress[1] * pos[2]);
-            x0 += (int) (inset + progress[0] * pos[2]);
+            float width = BAR_WIDTH * context.scale();
+            x1 = x0 + inset + (int) (progress[1] * width);
+            x0 += (int) (inset + progress[0] * width);
             y0 += inset;
             y1 -= inset;
             QuadHelper.loadQuad(bb, x0, x1, y0, y1, 0f, 0f, 0f, 0f, colour);
@@ -73,9 +75,5 @@ public class ProgressBar {
 
     public interface ProgressDisplay {
         float[] progress(int frame);
-    }
-
-    public interface BarPosition {
-        float[] location(RenderElement.DisplayContext context);
     }
 }

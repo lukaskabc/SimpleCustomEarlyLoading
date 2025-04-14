@@ -5,6 +5,7 @@ import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.con
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigurationException;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.Element;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.ApngTextureElement;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StartupProgressBar;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StaticTextureElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefEarlyFrameBuffer;
@@ -112,9 +113,9 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
             );
         });
 
-//        Optional.ofNullable(configuration.getProgressBar()).ifPresent(bar -> {
-//            elements.add(new StartupProgressBar(font, ElementType.ABSOLUTE.equals(bar.getType()), bar.getCoords()).get());
-//        });
+        Optional.ofNullable(configuration.getProgressBar()).ifPresent(barConfig -> {
+            elements.add(new StartupProgressBar(font, barConfig).get());
+        });
 
         // from forge early loading:
         if (configuration.isPerformanceBar()) {
