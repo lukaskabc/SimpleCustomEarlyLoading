@@ -1,40 +1,41 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading;
 
+import cpw.mods.modlauncher.ArgumentHandler;
+import cpw.mods.modlauncher.api.IEnvironment;
+import cpw.mods.modlauncher.api.ITransformationService;
+import cpw.mods.modlauncher.api.ITransformer;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.ObjectFieldCopier;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefImmediateWindowHandler;
 import net.minecraftforge.fml.earlydisplay.DisplayWindow;
 import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.forgespi.locating.IModFile;
-import net.minecraftforge.forgespi.locating.IModLocator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jspecify.annotations.NonNull;
 
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledFuture;
-import java.util.function.Consumer;
 
 import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.SimpleCustomEarlyLoadingWindow.EXPECTED_WINDOW_PROVIDER;
 
-public class DummyModLocator implements IModLocator {
+/**
+ * Dummy transformation service that attempts to inject
+ * {@link SimpleCustomEarlyLoadingWindow} to {@link net.minecraftforge.fml.loading.ImmediateWindowHandler#provider}
+ * during construction.
+ */
+public class DummyTransformationService implements ITransformationService {
     private static final Logger LOG = LogManager.getLogger();
 
     /**
-     * Constructed by {@link net.minecraftforge.fml.loading.moddiscovery.ModDiscoverer ModDiscoverer}
-     * <pre><code>
-     *     modLocatorList = ServiceLoaderUtils.streamServiceLoader(()-> modLocators, sce->LOGGER.error("Failed to load mod locator list", sce)).collect(Collectors.toList());
-     * </code></pre>
+     * Loaded and constructed by {@link cpw.mods.modlauncher.TransformationServicesHandler#discoverServices(ArgumentHandler.DiscoveryData) TransformationServicesHandler#discoverServices(ArgumentHandler.DiscoveryData)}
      * At time of construction, the {@link DisplayWindow} was already constructed and initialization scheduled.
      * Since the initialization is happening asynchronously we can't assume any specific state.
-     * <p>
      */
-    public DummyModLocator() {
+    public DummyTransformationService() {
         LOG.debug("Injecting Simple Custom Early Loading");
         injectAndReplaceEarlyWindow();
-        LOG.info("Injected Simple Custom Early Loading");
     }
 
     /**
@@ -48,6 +49,7 @@ public class DummyModLocator implements IModLocator {
                 RefImmediateWindowHandler.getProvider().getClass().equals(DisplayWindow.class)) {
             // not using instance of since we don't want any child classes, we want specifically DisplayWindow
             replaceImmediateWindowHandler(newProvider, (DisplayWindow) RefImmediateWindowHandler.getProvider());
+            LOG.info("Injected Simple Custom Early Loading");
         } else {
             LOG.error("""
                             Something went really wrong!
@@ -64,11 +66,11 @@ public class DummyModLocator implements IModLocator {
 
     /**
      * Since we can't be sure about the initialization state of the {@link DisplayWindow} we need to synchronize with it as much as possible.
-     * {@link DisplayWindow#initialize(String[])} and {@link DisplayWindow#start(String, String)} are called synchronously before initialization of {@link DummyModLocator}.
+     * {@link DisplayWindow#initialize(String[])} and {@link DisplayWindow#start(String, String)} are called synchronously before initialization of {@link DummyTransformationService}.
      * We are sure that {@link DisplayWindow#initializationFuture} is set - not sure about its state.
      *
-     * @param newProvider
-     * @param oldProvider
+     * @param newProvider new provider to be set
+     * @param oldProvider old provider to be replaced
      */
     private static void replaceImmediateWindowHandler(SimpleCustomEarlyLoadingWindow newProvider, DisplayWindow oldProvider) {
         final RefDisplayWindow displayWindow = new RefDisplayWindow(oldProvider);
@@ -90,30 +92,22 @@ public class DummyModLocator implements IModLocator {
     }
 
     @Override
-    public List<ModFileOrException> scanMods() {
-        // nothing to do in dummy implementation
-        // returning immutable empty list
-        return List.of();
-    }
-
-    @Override
     public String name() {
-        return "SimpleCustomEarlyLoading_DummyModLocator";
+        return "SimpleCustomEarlyLoading_DummyTransformationService";
     }
 
     @Override
-    public void scanFile(IModFile modFile, Consumer<Path> pathConsumer) {
-        // nothing to do in dummy implementation
+    public void initialize(IEnvironment environment) {
+
     }
 
     @Override
-    public void initArguments(Map<String, ?> arguments) {
-        // nothing to do in dummy implementation
+    public void onLoad(IEnvironment env, Set<String> otherServices) {
+
     }
 
     @Override
-    public boolean isValid(IModFile modFile) {
-        // nothing to do in dummy implementation
-        return false;
+    public @NonNull List<ITransformer> transformers() {
+        return List.of();
     }
 }
