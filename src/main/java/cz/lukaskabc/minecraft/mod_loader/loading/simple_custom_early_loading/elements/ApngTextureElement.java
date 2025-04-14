@@ -24,6 +24,7 @@ public class ApngTextureElement implements ElementSupplier {
 
     private final ApngTexture apngTexture;
     private final BoundsResolver boundsResolver;
+    private long lastFrameTime;
 
     public ApngTextureElement(String texture, BoundsResolver boundsResolver) {
         this.boundsResolver = boundsResolver;
@@ -33,6 +34,7 @@ public class ApngTextureElement implements ElementSupplier {
             Log.error("Failed to load texture: ", e.getMessage());
             throw new ConfigurationException(e);
         }
+        lastFrameTime = System.currentTimeMillis();
     }
 
     @Override
@@ -46,7 +48,19 @@ public class ApngTextureElement implements ElementSupplier {
         QuadHelper.loadQuad(csb.buffer(), bounds[0], bounds[2], bounds[1], bounds[3], uvs[0], uvs[1], uvs[2], uvs[3], COLOR);
         csb.buffer().draw();
         GL32C.glBindTexture(GL_TEXTURE_2D, 0);
-        apngTexture.nextFrame();
+        nextFrame();
+    }
+
+    /**
+     * Measures the elapsed time since the last call
+     * and if it exceeds the delay of the current frame,
+     * it advances to the next frame.
+     */
+    private void nextFrame() {
+        if (System.currentTimeMillis() - lastFrameTime > apngTexture.getCurrentDelay() * 1000) {
+            apngTexture.nextFrame();
+            lastFrameTime = System.currentTimeMillis();
+        }
     }
 
     private float[] getUV() {
