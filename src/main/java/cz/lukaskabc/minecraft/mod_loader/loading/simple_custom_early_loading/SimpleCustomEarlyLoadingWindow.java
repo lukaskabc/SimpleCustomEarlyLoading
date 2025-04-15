@@ -271,14 +271,17 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         final Object oldFrameBuffer = accessor.getFramebuffer();
         final int[] width = new int[1];
         final int[] height = new int[1];
+
+        glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
+        accessor.setFBSize(width[0], height[0]);
+
+        LOG.debug("The available size of the framebuffer in the window is {}x{}", width[0], height[0]);
+
         if (configuration.getResolutionWidth() > 0 && configuration.getResolutionHeight() > 0) {
             width[0] = configuration.getResolutionWidth();
             height[0] = configuration.getResolutionHeight();
-        } else {
-            glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
         }
 
-        accessor.setFBSize(width[0], height[0]);
         final RenderElement.DisplayContext context = new RenderElement.DisplayContext(
                 width[0],
                 height[0],

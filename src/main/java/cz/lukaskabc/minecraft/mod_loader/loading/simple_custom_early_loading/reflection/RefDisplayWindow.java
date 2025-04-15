@@ -41,6 +41,8 @@ public class RefDisplayWindow {
     private static final VarHandle renderLock = findField(lookup, "renderLock", Semaphore.class);
     private static final VarHandle windowTick = findField(lookup, "windowTick", ScheduledFuture.class);
     private static final VarHandle animationTimerTrigger = findField(lookup, "animationTimerTrigger", AtomicBoolean.class);
+    private static final VarHandle winWidth = findField(lookup, "winWidth", int.class);
+    private static final VarHandle winHeight = findField(lookup, "winHeight", int.class);
     private final DisplayWindow target;
 
     public RefDisplayWindow(DisplayWindow displayWindow) {
@@ -172,6 +174,14 @@ public class RefDisplayWindow {
         } catch (Throwable e) {
             throw new ReflectionException(e);
         }
+    }
+
+    public int getWinWidth() {
+        return (int) winWidth.get(target);
+    }
+
+    public int getWinHeight() {
+        return (int) winHeight.get(target);
     }
 
     public void winMove(long window, int x, int y) {
