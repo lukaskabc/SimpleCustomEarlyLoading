@@ -1,6 +1,11 @@
 // Check documentation for more information with examples
 // https://github.com/lukaskabc/SimpleCustomEarlyLoading#configuration
 {
+  // When specified, the window resolution will be fixed
+  // if omited, the window resolution will match the window size in fml.toml
+  "resolution_width": 1920,
+  "resolution_height": 1080,
+  // texture elements to render
   "elements": [
     // note that order matters - elements are rendered from top to bottom
     {
