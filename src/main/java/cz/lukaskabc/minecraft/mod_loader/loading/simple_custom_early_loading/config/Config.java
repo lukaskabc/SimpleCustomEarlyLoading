@@ -14,6 +14,9 @@ public class Config {
     private boolean logMessages = true;
     private boolean forgeVersion = true;
 
+    private int resolutionWidth = 0;
+    private int resolutionHeight = 0;
+
     public List<Element> getElements() {
         return elements;
     }
@@ -60,5 +63,21 @@ public class Config {
 
     public void setForgeVersion(boolean forgeVersion) {
         this.forgeVersion = forgeVersion;
+    }
+
+    public int getResolutionWidth() {
+        return resolutionWidth;
+    }
+
+    public void setResolutionWidth(int resolutionWidth) {
+        this.resolutionWidth = resolutionWidth;
+    }
+
+    public int getResolutionHeight() {
+        return resolutionHeight;
+    }
+
+    public void setResolutionHeight(int resolutionHeight) {
+        this.resolutionHeight = resolutionHeight;
     }
 }
