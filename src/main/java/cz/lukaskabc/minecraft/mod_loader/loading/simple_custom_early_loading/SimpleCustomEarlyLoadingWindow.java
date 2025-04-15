@@ -15,6 +15,8 @@ import net.neoforged.fml.earlydisplay.RenderElement;
 import net.neoforged.fml.earlydisplay.SimpleFont;
 import net.neoforged.fml.loading.FMLConfig;
 import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.lang.reflect.Method;
@@ -34,6 +36,7 @@ import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 
 public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
     public static final String WINDOW_PROVIDER = "SimpleCustomEarlyLoading";
+    private static final Logger LOG = LogManager.getLogger();
     private final RefDisplayWindow accessor;
     private final Config configuration;
 
@@ -256,14 +259,17 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         final Object oldFrameBuffer = accessor.getFramebuffer();
         final int[] width = new int[1];
         final int[] height = new int[1];
+
+        glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
+        accessor.setFBSize(width[0], height[0]);
+
+        LOG.debug("The available size of the framebuffer in the window is {}x{}", width[0], height[0]);
+
         if (configuration.getResolutionWidth() > 0 && configuration.getResolutionHeight() > 0) {
             width[0] = configuration.getResolutionWidth();
             height[0] = configuration.getResolutionHeight();
-        } else {
-            glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
         }
 
-        accessor.setFBSize(width[0], height[0]);
         final RenderElement.DisplayContext context = new RenderElement.DisplayContext(
                 width[0],
                 height[0],

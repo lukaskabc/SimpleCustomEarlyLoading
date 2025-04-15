@@ -1,10 +1,6 @@
 // Check documentation for more information with examples
 // https://github.com/lukaskabc/SimpleCustomEarlyLoading#configuration
 {
-  // When specified, the window resolution will be fixed
-  // if omited, the window resolution will match the window size in fml.toml
-  "resolution_width": 1920,
-  "resolution_height": 1080,
   // texture elements to render
   "elements": [
     // note that order matters - elements are rendered from top to bottom
@@ -62,4 +58,12 @@
   "log_messages": true,
   "forge_version": true
   // I dont think it would be nice to remove the mojang logo and change the branding, so I am not allowing it here
+
+  // When specified, the resolution of the frame buffer inside the window will be fixed to this size
+  // if omited, the resolution will match the window size in fml.toml
+  // also note that this resolution is for the frame buffer, some height of the window is taken by the window header
+  // so if you set the height of the monitor, you will get black strips on sides
+  // since the frame buffer will be actually higher than the space in the window
+  //"resolution_width": 854,
+  //"resolution_height": 480,
 }

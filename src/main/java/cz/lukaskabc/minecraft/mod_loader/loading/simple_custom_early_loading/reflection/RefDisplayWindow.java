@@ -37,6 +37,8 @@ public class RefDisplayWindow {
     private static final VarHandle font = findField(lookup, "font", SimpleFont.class);
     private static final VarHandle renderLock = findField(lookup, "renderLock", Semaphore.class);
     private static final VarHandle windowTick = findField(lookup, "windowTick", ScheduledFuture.class);
+    private static final VarHandle winWidth = findField(lookup, "winWidth", int.class);
+    private static final VarHandle winHeight = findField(lookup, "winHeight", int.class);
     private final DisplayWindow target;
 
     public RefDisplayWindow(DisplayWindow displayWindow) {
@@ -63,6 +65,10 @@ public class RefDisplayWindow {
         }
     }
 
+    public ScheduledExecutorService getRenderScheduler() {
+        return (ScheduledExecutorService) renderScheduler.get(target);
+    }
+
     /**
      * Sets the {@link DisplayWindow#renderScheduler} field.
      *
@@ -70,10 +76,6 @@ public class RefDisplayWindow {
      */
     public void setRenderScheduler(ScheduledExecutorService service) {
         renderScheduler.set(target, service);
-    }
-
-    public ScheduledExecutorService getRenderScheduler() {
-        return (ScheduledExecutorService) renderScheduler.get(target);
     }
 
     /**
@@ -168,5 +170,13 @@ public class RefDisplayWindow {
         } catch (Throwable e) {
             throw new ReflectionException(e);
         }
+    }
+
+    public int getWinWidth() {
+        return (int) winWidth.get(target);
+    }
+
+    public int getWinHeight() {
+        return (int) winHeight.get(target);
     }
 }
