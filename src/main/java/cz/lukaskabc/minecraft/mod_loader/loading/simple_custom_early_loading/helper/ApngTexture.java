@@ -240,7 +240,7 @@ public class ApngTexture {
             fillBuffer(byteBuffer, startingFrame, nextStartingFrame, frames, totalWidth);
 
             // prepare the buffer for reading
-            byteBuffer.rewind();
+            byteBuffer.flip();
 
             final int textureId = glGenTextures();
             // create the texture

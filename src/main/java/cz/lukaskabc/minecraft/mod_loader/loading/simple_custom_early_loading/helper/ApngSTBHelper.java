@@ -55,12 +55,10 @@ public class ApngSTBHelper {
      * @return the reallocated buffer
      */
     public static ByteBuffer reallocateWhenRequired(@Nullable ByteBuffer buffer, int requiredSize) {
-        if (buffer != null) {
-            buffer.clear();
-        }
-        if (buffer == null || buffer.remaining() < requiredSize) {
+        if (buffer == null || buffer.capacity() < requiredSize) {
             buffer = BufferUtils.createByteBuffer(requiredSize);
         }
+        buffer.clear();
         return buffer;
     }
 
