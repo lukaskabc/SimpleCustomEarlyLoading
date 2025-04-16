@@ -26,8 +26,8 @@ public class ApngSTBHelper {
         throw new AssertionError();
     }
 
-    public static ApngTexture resolveAndBindApngTexture(String file, int size) throws FileNotFoundException, PngException {
-        final InputStream inputStream = ConfigLoader.resolveFile(Path.of(file));
+    public static ApngTexture resolveAndBindApngTexture(String file) throws FileNotFoundException, PngException {
+        final InputStream inputStream = ConfigLoader.resolveFile(Path.of(file), null);
 
         final Argb8888BitmapSequence argbSequence = Png.readArgb8888BitmapSequence(inputStream);
 

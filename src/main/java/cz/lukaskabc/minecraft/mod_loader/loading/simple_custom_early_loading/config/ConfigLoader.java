@@ -7,8 +7,10 @@ import com.google.gson.JsonParseException;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jspecify.annotations.Nullable;
 
 import java.io.*;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -67,23 +69,51 @@ public class ConfigLoader {
         }
     }
 
+    private static void fileSize(int @Nullable [] size, Path path) {
+        try {
+            safeLongToInt(size, Files.size(path));
+        } catch (IOException e) {
+            throw new ConfigurationException(e);
+        }
+    }
+
+    private static void safeLongToInt(int @Nullable [] size, long value) {
+        if (size == null) {
+            return;
+        }
+        try {
+            size[0] = Math.toIntExact(value);
+        } catch (ArithmeticException e) {
+            LOG.error("File size is too big: {}. Max integer size is {}", value, Integer.MAX_VALUE);
+            throw new ConfigurationException(e);
+        }
+    }
+
+    private static void fileSize(int @Nullable [] size, URLConnection fileConnection) {
+        safeLongToInt(size, fileConnection.getContentLength());
+    }
+
     /**
      * Tries to resolve file inside {@link #getConfigDirectory()} otherwise resolves file from resources on classpath
      */
-    public static InputStream resolveFile(Path path) throws FileNotFoundException {
+    public static InputStream resolveFile(Path path, int @Nullable [] size) throws FileNotFoundException {
         if (path.startsWith("/") || path.startsWith("\\")) {
             path = Path.of(path.toString().substring(1));
         }
-        final Path configDir = getConfigDirectory().resolve(path);
-        if (Files.exists(configDir)) {
-            return new FileInputStream(configDir.toFile());
+        final Path imagePath = getConfigDirectory().resolve(path);
+        if (Files.exists(imagePath)) {
+            fileSize(size, imagePath);
+            return new FileInputStream(imagePath.toFile());
         }
 
-        String classPath = "/" + path.toString().replace('\\', '/');
-        final InputStream result = ConfigLoader.class.getResourceAsStream(classPath);
-        if (result == null) {
-            throw new FileNotFoundException(configDir.toString());
+        String classPath = path.toString().replace('\\', '/');
+        try {
+            final var fileConnection = ClassLoader.getSystemResource(classPath).openConnection();
+            fileSize(size, fileConnection);
+            return fileConnection.getInputStream();
+        } catch (IOException | NullPointerException e) {
+            LOG.error(e);
+            throw new FileNotFoundException("File not found: " + imagePath.toString());
         }
-        return result;
     }
 }
