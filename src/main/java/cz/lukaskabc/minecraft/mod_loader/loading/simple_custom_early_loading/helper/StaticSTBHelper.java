@@ -33,7 +33,7 @@ public class StaticSTBHelper {
     public static ByteBuffer readToBuffer(final InputStream inputStream, int initialCapacity) {
         ByteBuffer buf;
         try (var channel = Channels.newChannel(inputStream)) {
-            buf = BufferUtils.createByteBuffer(initialCapacity);
+            buf = BufferUtils.createByteBuffer(initialCapacity + 1);
             while (true) {
                 var readbytes = channel.read(buf);
                 if (readbytes == -1) break;
@@ -54,11 +54,12 @@ public class StaticSTBHelper {
     /**
      * @return textureId
      */
-    public static int resolveAndBindTexture(String file, int size, int[] textureWidth, int[] textureHeight) throws FileNotFoundException {
+    public static int resolveAndBindTexture(String file, int[] textureWidth, int[] textureHeight) throws FileNotFoundException {
         int[] lc = new int[1];
+        int[] fileSize = new int[]{300000}; // default texture size 30kB
 
-        final InputStream inputStream = ConfigLoader.resolveFile(Path.of(file));
-        ByteBuffer buf = readToBuffer(inputStream, size);
+        final InputStream inputStream = ConfigLoader.resolveFile(Path.of(file), fileSize);
+        ByteBuffer buf = readToBuffer(inputStream, fileSize[0]);
         final ByteBuffer img = STBImage.stbi_load_from_memory(buf, textureWidth, textureHeight, lc, 4);
 
         int texid = glGenTextures();

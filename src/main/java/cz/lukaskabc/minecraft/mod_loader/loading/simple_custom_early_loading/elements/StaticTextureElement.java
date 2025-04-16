@@ -32,7 +32,6 @@ public class StaticTextureElement implements ElementSupplier {
     );
 
     public static final int COLOR = (255 << 24) | 0xFFFFFF;
-    private static final int DEFAULT_TEXTURE_SIZE = 34881;
 
     private final int[] textureSize;
     private final int textureId;
@@ -43,7 +42,7 @@ public class StaticTextureElement implements ElementSupplier {
         final int[] textureHeight = new int[1];
         this.boundsResolver = boundsResolver;
         try {
-            textureId = StaticSTBHelper.resolveAndBindTexture(texture, DEFAULT_TEXTURE_SIZE, textureWidth, textureHeight);
+            textureId = StaticSTBHelper.resolveAndBindTexture(texture, textureWidth, textureHeight);
         } catch (FileNotFoundException e) {
             Log.error("Failed to load texture: ", e.getMessage());
             throw new ConfigurationException(e);

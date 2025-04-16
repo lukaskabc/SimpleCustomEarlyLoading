@@ -48,23 +48,6 @@ public class StartupProgressBar extends ProgressBar implements Supplier<RenderEl
         }
     }
 
-    public static float[] relativeCoords(float[] coords, CSB csb) {
-        final float width = csb.ctx().scaledWidth() / 100f;
-        final float height = csb.ctx().scaledHeight() / 100f;
-        return new float[]{
-                coords[0] * width,
-                coords[1] * height,
-        };
-    }
-
-    private static int[] toIntArray(float[] arr) {
-        int[] result = new int[arr.length];
-        for (int i = 0; i < arr.length; i++) {
-            result[i] = (int) arr[i];
-        }
-        return result;
-    }
-
     @Override
     public RenderElement get() {
         return RefRenderElement.constructor(this::render);

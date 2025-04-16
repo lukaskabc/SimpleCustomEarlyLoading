@@ -29,7 +29,7 @@ public class ApngTextureElement implements ElementSupplier {
     public ApngTextureElement(String texture, BoundsResolver boundsResolver) {
         this.boundsResolver = boundsResolver;
         try {
-            apngTexture = ApngSTBHelper.resolveAndBindApngTexture(texture, DEFAULT_TEXTURE_SIZE);
+            apngTexture = ApngSTBHelper.resolveAndBindApngTexture(texture);
         } catch (FileNotFoundException | PngException e) {
             Log.error("Failed to load texture: ", e.getMessage());
             throw new ConfigurationException(e);
