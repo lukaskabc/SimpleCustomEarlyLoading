@@ -10,19 +10,19 @@
       "position": {
         // define which point in the image should be aligned at x, y position on the window
         // Possible values: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER, TOP_CENTER, BOTTOM_CENTER, LEFT_CENTER, RIGHT_CENTER
-        "position_anchor": "CENTER",
+        "position_anchor": "TOP_LEFT",
         // The unit for x, y position PIXELS or PERCENTAGE (percentage of the window values: 0-100)
-        "position_unit": "PERCENTAGE",
+        "position_unit": "PIXELS",
         // The position of the anchor on the screen in positionUnit
-        "x": 50,
-        "y": 50,
+        "x": 0,
+        "y": 0,
         // The unit for width, height - PIXELS or PERCENTAGE (again, percantage of the window)
         "size_unit": "PERCENTAGE",
         // The width and height of the image in sizeUnit
         // if you specify both values, the aspect ratio is not preserved
         // if you specify only one value, the other is calculated to preserve the aspect ratio
-        "width": 100
-        //"height": 100
+        "width": 100,
+        "height": 100
       }
     },
     {
@@ -38,6 +38,21 @@
         "size_unit": "PERCENTAGE",
         // the loading text should be 25% of the window width
         "width": 25
+      }
+    },
+    {
+      // apng example
+      // source: https://github.com/Hashibutogarasu/MojangLogoAnimation-Assets
+      "image": "mojang-animated-logo.apng",
+      "position": {
+        "position_anchor": "TOP_CENTER",
+        // Units for x, y position can be defined separately
+        "position_unit_x": "PERCENTAGE",
+        "position_unit_y": "PIXELS",
+        "x": 50,
+        "y": 82,
+        "size_unit": "PIXELS",
+        "width": 512
       }
     }
   ],
@@ -59,11 +74,11 @@
   "forge_version": true
   // I dont think it would be nice to remove the mojang logo and change the branding, so I am not allowing it here
 
-  // When specified, the resolution of the frame buffer inside the window will be fixed to this size
-  // if omited, the resolution will match the window size in fml.toml
+  // When specified, the window resolution will be fixed
+  // if omited, the window resolution will match the window size in fml.toml
   // also note that this resolution is for the frame buffer, some height of the window is taken by the window header
-  // so if you set the height of the monitor, you will get black strips on sides
+  // so if you set the height of the monitor, you will get black bars on sides
   // since the frame buffer will be actually higher than the space in the window
-  //"resolution_width": 854,
-  //"resolution_height": 480,
+  // "resolution_width": 854,
+  // "resolution_height": 480
 }

@@ -2,6 +2,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.co
 
 import com.google.gson.annotations.SerializedName;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.element_anchor.ElementAnchor;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Represents the element position and size on the screen.
@@ -17,6 +18,10 @@ public class ElementPosition implements BoundsResolver {
      * Percentage are relative to the window size.
      */
     private Unit positionUnit = Unit.PIXELS;
+    @Nullable
+    private Unit positionUnitX = null;
+    @Nullable
+    private Unit positionUnitY = null;
     /**
      * Unit for {@link #width} and {@link #height} values.
      * <p>
@@ -121,11 +126,14 @@ public class ElementPosition implements BoundsResolver {
         // the size of the element on the screen
         resolveSize(elementWidth, elementHeight, screenWidth, screenHeight, position);
 
-        if (positionUnit == Unit.PERCENTAGE) {
+        if (getPositionUnitX() == Unit.PERCENTAGE) {
             position[0] = (int) (x * screenWidth / 100f);
-            position[1] = (int) (y * screenHeight / 100f);
         } else {
             position[0] = (int) x;
+        }
+        if (getPositionUnitY() == Unit.PERCENTAGE) {
+            position[1] = (int) (y * screenHeight / 100f);
+        } else {
             position[1] = (int) y;
         }
 
@@ -139,6 +147,26 @@ public class ElementPosition implements BoundsResolver {
      */
     public boolean hasHeight() {
         return Float.isFinite(height);
+    }
+
+    public Unit getPositionUnitX() {
+        if (positionUnitX == null)
+            return positionUnit;
+        return positionUnitX;
+    }
+
+    public void setPositionUnitX(@Nullable Unit positionUnitX) {
+        this.positionUnitX = positionUnitX;
+    }
+
+    public Unit getPositionUnitY() {
+        if (positionUnitY == null)
+            return positionUnit;
+        return positionUnitY;
+    }
+
+    public void setPositionUnitY(@Nullable Unit positionUnitY) {
+        this.positionUnitY = positionUnitY;
     }
 
     public Unit getPositionUnit() {
