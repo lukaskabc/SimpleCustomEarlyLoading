@@ -113,7 +113,7 @@ public class ConfigLoader {
             return fileConnection.getInputStream();
         } catch (IOException | NullPointerException e) {
             LOG.error(e);
-            throw new FileNotFoundException("File not found: " + imagePath.toString());
+            throw new FileNotFoundException("File not found: " + imagePath);
         }
     }
 }

@@ -45,7 +45,6 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         checkFMLConfig();
         ConfigLoader.copyDefaultConfig();
         configuration = ConfigLoader.loadConfiguration();
-
     }
 
     /**

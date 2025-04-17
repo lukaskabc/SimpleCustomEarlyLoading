@@ -20,7 +20,6 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 
 public class ApngTextureElement implements ElementSupplier {
     public static final Set<String> SUPPORTED_EXTENSIONS = Set.of("apng");
-    private static final int DEFAULT_TEXTURE_SIZE = 34881;
 
     private final ApngTexture apngTexture;
     private final BoundsResolver boundsResolver;
