@@ -17,8 +17,6 @@ public class Config {
     private int resolutionWidth = 0;
     private int resolutionHeight = 0;
 
-    private float originalElementScale = 1f;
-
     public List<Element> getElements() {
         return elements;
     }
@@ -83,11 +81,4 @@ public class Config {
         this.resolutionHeight = resolutionHeight;
     }
 
-    public float getOriginalElementScale() {
-        return originalElementScale;
-    }
-
-    public void setOriginalElementScale(float originalElementScale) {
-        this.originalElementScale = originalElementScale;
-    }
 }

@@ -13,9 +13,7 @@ import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_load
 public class RefRenderElement {
     public static final Class<?> RENDERER_CLASS = findClass("net.minecraftforge.fml.earlydisplay.RenderElement$Renderer");
     public static final Class<?> INITIALIZER_CLASS = findClass("net.minecraftforge.fml.earlydisplay.RenderElement$Initializer");
-    public static final int LOADING_INDEX_TEXTURE_OFFSET = 10;
     private static final MethodHandles.Lookup lookup = privateLookup(RenderElement.class);
-    public static final int INDEX_TEXTURE_OFFSET = (int) findStaticField(lookup, "INDEX_TEXTURE_OFFSET", int.class).get() + LOADING_INDEX_TEXTURE_OFFSET;
     private static final MethodHandle constructor = findConstructor(lookup, INITIALIZER_CLASS);
     private static final VarHandle globalAlpha = findStaticField(lookup, "globalAlpha", int.class);
 
