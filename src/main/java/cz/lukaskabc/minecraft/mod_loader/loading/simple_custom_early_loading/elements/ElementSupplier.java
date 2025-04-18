@@ -2,7 +2,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.el
 
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.CSB;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefRenderElement;
-import net.neoforged.fml.earlydisplay.RenderElement;
+import net.minecraftforge.fml.earlydisplay.RenderElement;
 
 import java.util.function.Supplier;
 

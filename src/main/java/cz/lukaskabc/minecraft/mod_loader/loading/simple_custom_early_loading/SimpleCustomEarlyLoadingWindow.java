@@ -25,8 +25,6 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -107,6 +105,10 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      */
     private void constructElements(final List<RenderElement> elements) {
         final SimpleFont font = accessor.getFont();
+        final RenderElement anvil = elements.get(0);
+        final RenderElement logMessageOverlay = elements.get(1);
+        final RenderElement forgeVersionOverlay = elements.get(2);
+        elements.clear();
 
         Optional.ofNullable(configuration.getElements()).ifPresent(list -> {
             list.forEach(el ->
@@ -125,17 +127,17 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         }
 
         if (configuration.isAnvil()) {
-            elements.add(RenderElement.anvil(font));
+            elements.add(anvil);
         }
 
         if (configuration.isLogMessages()) {
             // bottom left log messages
-            elements.add(RenderElement.logMessageOverlay(font));
+            elements.add(logMessageOverlay);
         }
 
         if (configuration.isForgeVersion()) {
             // bottom right game version
-            elements.add(RenderElement.forgeVersionOverlay(font, mcVersion + "-" + forgeVersion.split("-")[0]));
+            elements.add(forgeVersionOverlay);
         }
     }
 

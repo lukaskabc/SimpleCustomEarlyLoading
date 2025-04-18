@@ -6,9 +6,9 @@ import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.hel
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.ApngTexture;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.CSB;
 import net.ellerton.japng.error.PngException;
-import net.neoforged.fml.earlydisplay.ElementShader;
-import net.neoforged.fml.earlydisplay.QuadHelper;
-import net.neoforged.fml.earlydisplay.SimpleBufferBuilder;
+import net.minecraftforge.fml.earlydisplay.ElementShader;
+import net.minecraftforge.fml.earlydisplay.QuadHelper;
+import net.minecraftforge.fml.earlydisplay.SimpleBufferBuilder;
 import org.jline.utils.Log;
 import org.lwjgl.opengl.GL32C;
 

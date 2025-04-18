@@ -10,9 +10,9 @@ import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.Nullable;
 
 import java.io.*;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 public class ConfigLoader {
     private static final String STARGATE_VARIANT_CONFIG_DIRECTORY = "simple-custom-early-loading";
@@ -89,8 +89,8 @@ public class ConfigLoader {
         }
     }
 
-    private static void fileSize(int @Nullable [] size, URLConnection fileConnection) {
-        safeLongToInt(size, fileConnection.getContentLength());
+    private static void fileSize(int @Nullable [] size, byte[] data) {
+        safeLongToInt(size, data.length);
     }
 
     /**
@@ -106,13 +106,13 @@ public class ConfigLoader {
             return new FileInputStream(imagePath.toFile());
         }
 
-        String classPath = path.toString().replace('\\', '/');
+        String classPath = '/' + path.toString().replace('\\', '/');
         try {
-            final var fileConnection = ClassLoader.getSystemResource(classPath).openConnection();
-            fileSize(size, fileConnection);
-            return fileConnection.getInputStream();
+            final byte[] data = Objects.requireNonNull(ConfigLoader.class.getResourceAsStream(classPath)).readAllBytes();
+            fileSize(size, data);
+            return new ByteArrayInputStream(data);
         } catch (IOException | NullPointerException e) {
-            LOG.error(e);
+            LOG.error("Failed to resolve file: {}", imagePath);
             throw new FileNotFoundException("File not found: " + imagePath);
         }
     }

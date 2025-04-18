@@ -63,10 +63,6 @@ legacyForge {
         }
     }
 
-    unitTest {
-        enable()
-        testedMod = mods."${mod_id}"
-    }
 }
 
 dependencies {
