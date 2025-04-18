@@ -16,7 +16,7 @@ jobs:
           
       - name: Update Gradle wrapper
         run: |
-          sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.10-bin.zip|' gradle/wrapper/gradle-wrapper.properties
+          sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-4.5-bin.zip|' gradle/wrapper/gradle-wrapper.properties
 
       - name: Add maven publish plugin
         run: |
