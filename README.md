@@ -28,7 +28,8 @@ I won't allow removing the Mojang logo.
 
 **Animated images:**
 
-- APNG
+- **APNG** - must be created without unchanged pixels detection (each frame is rendered from scratch).
+  The animation will respect the image timing and repeat count.
 
 **Static images:**
 
@@ -82,24 +83,42 @@ You can find default
 config [here](https://github.com/lukaskabc/SimpleCustomEarlyLoading/blob/main/src/main/resources/default_config.json).
 
 In the configuration you can specify elements.
-Each element is one static image.
-You need to specify the type of coordinates (`absolute` or `percentage`).
-Note that the image size might be different on different displays, so you probably want to use percentage.
+Each element is one image in a supported format.
+The element needs to have a position specified.
 
-Percentage values should be from range [0; 100].
-You need to specify coordinates for two corners of the image (top left and bottom right).
+First you define the `position_anchor` which specifies which part of the image is aligned with the x and y coordinates.
+For example, `TOP_LEFT` means, that top left corner of the image will be aligned to the x and y coordinates.
+Possible values are: `TOP_LEFT`, `TOP_RIGHT`, `BOTTOM_LEFT`, `BOTTOM_RIGHT`, `CENTER`, `TOP_CENTER`, `BOTTOM_CENTER`,
+`LEFT_CENTER`, `RIGHT_CENTER`.
+You can see the specifications in
+the [ElementAnchor enum](./src/main/java/cz/lukaskabc/minecraft/mod_loader/loading/simple_custom_early_loading/config/element_anchor/ElementAnchor.java).
+
+`position_unit` specifies the type of coordinates for `x` and `y` coordinates.
+`PIXELS` means that coordinates are absolute pixels in the window.
+`PERCENTAGE` means that coordinates are percentage of the window size.
+E.g. `x=50` and `y=50` means that the image anchor will be positioned in the middle of the window.
+
+It is also possible to specify the position units for each coordinate separately.
+(`position_unit_x`, `position_unit_y`)
+
+`x` and `y` coordinates specify the position of the image anchor in the position units.
+
+`width` and `height` specify the size of the image on the screen.
+
+`size_unit` specifies the unit for the width and height parameters (again `PIXELS` or `PERCENTAGE`).
+Percentage values are calculated from the window size.
+
+You can specify only one parameter, either `width` or `height` and the second will be calculated from the aspect ratio
+of the image.
 
 The default config contains an example of background (stretched to the whole window) -
 it is a screenshot from the game with the [stellarview](https://github.com/Povstalec/StellarView) mod.  
-Second element is an image created with [BlockBench](https://www.blockbench.net/)
-with [text generator plugin](https://www.blockbench.net/plugins/mc_text_generator).
+Second element is an APNG animation created with [BlockBench](https://www.blockbench.net/)
+with [text generator plugin](https://www.blockbench.net/plugins/mc_text_generator)
+and [ScreenToGif application](https://www.screentogif.com/).
 
-The image size is 654x152 pixels.
-Assuming the window size is FullHD 1920x1080, then one percentage for that is 1920/100 = 19.2 and 1080/100 = 10.8.
-Then the size of the image scaled to 75% in percentage is `654 * 0.75 / 19.2 = 25.55` and `152 * 0.75 / 10.8 = 10.55`.
-X coordinates: Image positioned in the middle (50%) has coordinates from `50 - 25.55 / 2 = 37.225` (x1) to
-`50 + 25.55 / 2 = 62.775` (x2).
-Y coordinates: Image position at 55% from the top has coordinates from `55` (y1) to `55 + 10.55 = 65.55` (y2).
+For creating APNG animations, I recommend using [ScreenToGif application](https://www.screentogif.com/).
+During export, you need to **uncheck** the "Detect unchanged pixels" option.
 
 # Development
 
