@@ -32,13 +32,13 @@ jobs:
       - name: Build and Install
         run: ./gradlew clean build publishToMavenLocal -x test
 
+      - name: Debug - List all files in home directory
+        run: find ~
+
       - name: Check if required Maven files exist
         run: |
           test -f ~/.m2/repository/japng/api/0.5.1/api-0.5.1.pom && echo "api-0.5.1.pom exists" || (echo "api-0.5.1.pom is missing" && exit 1)
           test -f ~/.m2/repository/japng/api/0.5.1/api-0.5.1.jar && echo "api-0.5.1.jar exists" || (echo "api-0.5.1.jar is missing" && exit 1)
-
-      - name: Debug - List all files in home directory
-        run: find ~
 
       # Update Cache
       - name: Update Cache
