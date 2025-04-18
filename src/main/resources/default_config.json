@@ -4,6 +4,7 @@
   // texture elements to render
   "elements": [
     // note that order matters - elements are rendered from top to bottom
+    // lower elements will be rendered over the higher ones
     {
       // example background
       "image": "stellarview.png",
@@ -12,13 +13,14 @@
         // Possible values: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER, TOP_CENTER, BOTTOM_CENTER, LEFT_CENTER, RIGHT_CENTER
         "position_anchor": "TOP_LEFT",
         // The unit for x, y position PIXELS or PERCENTAGE (percentage of the window values: 0-100)
+        // the position unit can also be defined for each coordinate separately position_unit_x, position_unit_y
         "position_unit": "PIXELS",
-        // The position of the anchor on the screen in positionUnit
+        // The position of the anchor on the screen in position_unit
         "x": 0,
         "y": 0,
-        // The unit for width, height - PIXELS or PERCENTAGE (again, percantage of the window)
+        // The unit for width, height - PIXELS or PERCENTAGE (again, percantage of the window) - can't be defined separately
         "size_unit": "PERCENTAGE",
-        // The width and height of the image in sizeUnit
+        // The width and height of the image in size_unit
         // if you specify both values, the aspect ratio is not preserved
         // if you specify only one value, the other is calculated to preserve the aspect ratio
         "width": 100,
@@ -27,7 +29,8 @@
     },
     {
       // the loading text should be centered and poistioned at 60% from the top of the window
-      "image": "loading.png",
+      // loading.png is also available if you want the text without animation
+      "image": "loading.apng",
       "position": {
         // using bottom center alignes the bottom of the loading text to the 60%
         // this comes handy as we want to render the loading bar below it
@@ -39,24 +42,9 @@
         // the loading text should be 25% of the window width
         "width": 25
       }
-    },
-    {
-      // apng example
-      // source: https://github.com/Hashibutogarasu/MojangLogoAnimation-Assets
-      "image": "mojang-animated-logo.apng",
-      "position": {
-        "position_anchor": "TOP_CENTER",
-        // Units for x, y position can be defined separately
-        "position_unit_x": "PERCENTAGE",
-        "position_unit_y": "PIXELS",
-        "x": 50,
-        "y": 82,
-        "size_unit": "PIXELS",
-        "width": 512
-      }
     }
   ],
-  // "progress_bar": null to remove the default element
+  // "progress_bar": null to remove the default progress bar element
   "progress_bar": {
     // 3 is also default when the value is not specified
     "bar_count": 3,
