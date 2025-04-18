@@ -114,9 +114,6 @@ Japng © Copyright A. Ellerton.
 Japng is licensed under Apache-2.0.  
 [Japng GitHub repository](https://github.com/aellerton/japng)
 
-Mojang Studios animated logo  
-Mojang AB. TM Microsoft Corporation.  
-[Logo source: Hashibutogarasu](https://github.com/Hashibutogarasu/MojangLogoAnimation-Assets)
 ___
 
 NOT AN OFFICIAL MINECRAFT PRODUCT/SERVICE/MOD. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT
