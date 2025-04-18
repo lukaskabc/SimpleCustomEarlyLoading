@@ -36,13 +36,14 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
 
-      - name: Setup Gradle Caches
-        uses: actions/cache@v3
+      - name: Restore japng Maven Cache
+        uses: actions/cache/restore@v4
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: ${{ runner.os }}-gradle
+          fail-on-cache-miss: true
+          path: ~/.m2/repository
+          key: japng-maven-repo-${{ runner.os }}
 
       - name: Setup Gradle Wrapper
         run: chmod +x gradlew
