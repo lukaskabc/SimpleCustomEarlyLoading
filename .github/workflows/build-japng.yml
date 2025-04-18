@@ -1,0 +1,39 @@
+name: Build and Cache japng
+
+on:
+  workflow_dispatch: # Allow manually triggering the workflow
+
+jobs:
+  build-japng:
+    name: Build japng and upload it to cache
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout japng repository
+        uses: actions/checkout@v4
+        with:
+          repository: aellerton/japng
+
+      # Step 2: Update Gradle wrapper to version 8.10
+      - name: Update Gradle wrapper
+        run: |
+          sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.10-bin.zip|' gradle/wrapper/gradle-wrapper.properties
+
+      # Step 3: Set up Java environment
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # Step 5: Build and install japng to the local Maven repository
+      - name: Build and Install
+        run: ./gradlew clean build publishToMavenLocal
+
+      # Step 6: Update Cache
+      - name: Update Cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: japng-maven-repo-${{ runner.os }}
