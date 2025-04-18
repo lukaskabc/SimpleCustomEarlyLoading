@@ -4,6 +4,7 @@ name: Automatically publish to Modrinth and CurseForge
 # The release tag is used as the version number
 # The release description is used as the changelog
 on:
+  workflow_dispatch:
   release:
     types: [ published ]
 
@@ -33,13 +34,17 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
 
-      - name: Setup Gradle Caches
-        uses: actions/cache@v3
+      - name: Restore japng Maven Cache
+        uses: actions/cache/restore@v4
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: ${{ runner.os }}-gradle
+          fail-on-cache-miss: true
+          path: ~/.m2/repository
+          key: japng-maven-repo-${{ runner.os }}
+
+      - name: Debug - List all files in home directory
+        run: find ~
 
       - name: Setup Gradle Wrapper
         run: chmod +x gradlew
