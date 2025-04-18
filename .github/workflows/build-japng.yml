@@ -22,11 +22,11 @@ jobs:
         run: |
           sed -i '/subprojects {/a \    apply plugin: '\''maven-publish'\''' build.gradle
 
-      - name: Set up JDK 17
+      - name: Set up JDK 8
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '8'
 
       # Build and install japng to the local Maven repository without tests
       - name: Build and Install
