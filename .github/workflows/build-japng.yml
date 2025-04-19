@@ -22,15 +22,19 @@ jobs:
         run: |
           sed -i '/subprojects {/a \    apply plugin: '\''maven-publish'\''\n\n    publishing {\n        publications {\n            maven(MavenPublication) {\n                from components.java\n            }\n        }\n    }' build.gradle
 
+      - name: Add mavenLocal to repositories
+        run: sed -i '/repositories {/a \    mavenLocal()' build.gradle
+
       - name: Set up JDK 8
         uses: actions/setup-java@v3
         with:
+          cache: 'gradle'
           distribution: 'temurin'
           java-version: '8'
 
       # Build and install japng to the local Maven repository without tests
       - name: Build and Install
-        run: ./gradlew clean build publishToMavenLocal -x test
+        run: ./gradlew clean build publishToMavenLocal --info -x test
 
       - name: Debug - List all files in home directory
         run: find ~
