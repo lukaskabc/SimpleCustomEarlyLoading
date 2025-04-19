@@ -12,17 +12,21 @@ jobs:
       - name: Checkout japng repository
         uses: actions/checkout@v4
         with:
+          path: japng
           repository: aellerton/japng
 
       - name: Update Gradle wrapper
+        working-directory: japng
         run: |
           sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-4.5-bin.zip|' gradle/wrapper/gradle-wrapper.properties
 
       - name: Add maven publish plugin
+        working-directory: japng
         run: |
           sed -i '/subprojects {/a \    apply plugin: '\''maven-publish'\''\n\n    publishing {\n        publications {\n            maven(MavenPublication) {\n                from components.java\n            }\n        }\n    }' build.gradle
 
       - name: Add mavenLocal to repositories
+        working-directory: japng
         run: sed -i '/repositories {/a \    mavenLocal()' build.gradle
 
       - name: Set up JDK 8
@@ -34,10 +38,8 @@ jobs:
 
       # Build and install japng to the local Maven repository without tests
       - name: Build and Install
+        working-directory: japng
         run: ./gradlew clean build publishToMavenLocal --info -x test
-
-      - name: Move repository
-        run: mv ~/.m2/repository/SimpleCustomEarlyLoading ~/.m2/repository/japng
 
       - name: Debug - List all files in home directory
         run: find ~/.m2
