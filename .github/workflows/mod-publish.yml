@@ -15,7 +15,7 @@ env:
     [1.21,1.21.4]
   GAME_VERSION_FILTER: releases
   VERSION_TYPE: release
-  PRIMARY_FILE_GLOB: build/libs/SimpleCustomEarlyLoading-*.jar
+  PRIMARY_FILE_GLOB: build/libs/SimpleCustomEarlyLoading-*-neoforge.jar
 
 jobs:
   build:
@@ -27,7 +27,7 @@ jobs:
       tag_version: ${{ env.TAG }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Java
         uses: actions/setup-java@v3
@@ -42,9 +42,6 @@ jobs:
           fail-on-cache-miss: true
           path: ~/.m2/repository/japng/api
           key: japng-maven-repo-${{ runner.os }}
-
-      - name: Debug - List all files in home directory
-        run: find ~
 
       - name: Setup Gradle Wrapper
         run: chmod +x gradlew
@@ -70,7 +67,7 @@ jobs:
 
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: ${{ env.PRIMARY_FILE_GLOB }}
@@ -83,7 +80,7 @@ jobs:
       contents: write
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-artifacts
           path: artifacts
@@ -93,7 +90,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           github-prerelease: false
-          files-primary: artifacts/${{ env.PRIMARY_FILE_GLOB }}
+          files: artifacts/${{ env.PRIMARY_FILE_GLOB }}
           version-type: ${{ env.VERSION_TYPE }}
           loaders: ${{ env.MOD_LOADERS }}
           game-versions: ${{ env.GAME_VERSIONS }}
@@ -108,7 +105,7 @@ jobs:
       contents: write
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-artifacts
           path: artifacts
@@ -118,7 +115,7 @@ jobs:
         with:
           curseforge-id: 1214077
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-          files-primary: artifacts/${{ env.PRIMARY_FILE_GLOB }}
+          files: artifacts/${{ env.PRIMARY_FILE_GLOB }}
           version-type: ${{ env.VERSION_TYPE }}
           loaders: ${{ env.MOD_LOADERS }}
           game-versions: ${{ env.GAME_VERSIONS }}
@@ -133,7 +130,7 @@ jobs:
       contents: write
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: build-artifacts
           path: artifacts
@@ -143,7 +140,7 @@ jobs:
         with:
           modrinth-id: Bi8o4aLw
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          files-primary: artifacts/${{ env.PRIMARY_FILE_GLOB }}
+          files: artifacts/${{ env.PRIMARY_FILE_GLOB }}
           version-type: ${{ env.VERSION_TYPE }}
           loaders: ${{ env.MOD_LOADERS }}
           game-versions: ${{ env.GAME_VERSIONS }}
