@@ -18,7 +18,7 @@ env:
     1.20.6
   GAME_VERSION_FILTER: releases
   VERSION_TYPE: release
-  PRIMARY_FILE_GLOB: SimpleCustomEarlyLoading-*.jar
+  PRIMARY_FILE_GLOB: SimpleCustomEarlyLoading-*-forge.jar
 
 jobs:
   build:
@@ -45,10 +45,6 @@ jobs:
           fail-on-cache-miss: true
           path: ~/.m2/repository/japng/api
           key: japng-maven-repo-${{ runner.os }}
-
-      - name: Debug - List all files in home directory
-        run: find ~
-
 
       - name: Setup Gradle Wrapper
         run: chmod +x gradlew
@@ -77,78 +73,78 @@ jobs:
         with:
           name: build-artifacts
           path: build/libs/${{ env.PRIMARY_FILE_GLOB }}
-#
-#  publish-to-github:
-#    needs: build
-#    runs-on: ubuntu-latest
-#    environment: github-actions
-#    permissions:
-#      contents: write
-#    steps:
-#      - name: Download artifacts
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: build-artifacts
-#          path: artifacts
-#
-#      - name: Publish to GitHub
-#        uses: Kir-Antipov/mc-publish@v3.3
-#        with:
-#          github-token: ${{ secrets.GITHUB_TOKEN }}
-#          github-prerelease: false
-#          files: artifacts/${{ env.PRIMARY_FILE_GLOB }}
-#          version-type: ${{ env.VERSION_TYPE }}
-#          loaders: ${{ env.MOD_LOADERS }}
-#          game-versions: ${{ env.GAME_VERSIONS }}
-#          game-version-filter: ${{ env.GAME_VERSION_FILTER }}
-#          java: ${{ env.JAVA_VERSION }}
-#
-#  publish-to-curseforge:
-#    needs: build
-#    runs-on: ubuntu-latest
-#    environment: github-actions
-#    permissions:
-#      contents: write
-#    steps:
-#      - name: Download artifacts
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: build-artifacts
-#          path: artifacts
-#
-#      - name: Publish to CurseForge
-#        uses: Kir-Antipov/mc-publish@v3.3
-#        with:
-#          curseforge-id: 1214077
-#          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
-#          files: artifacts/${{ env.PRIMARY_FILE_GLOB }}
-#          version-type: ${{ env.VERSION_TYPE }}
-#          loaders: ${{ env.MOD_LOADERS }}
-#          game-versions: ${{ env.GAME_VERSIONS }}
-#          game-version-filter: ${{ env.GAME_VERSION_FILTER }}
-#          java: ${{ env.JAVA_VERSION }}
-#
-#  publish-to-modrinth:
-#    needs: build
-#    runs-on: ubuntu-latest
-#    environment: github-actions
-#    permissions:
-#      contents: write
-#    steps:
-#      - name: Download artifacts
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: build-artifacts
-#          path: artifacts
-#
-#      - name: Publish to Modrinth
-#        uses: Kir-Antipov/mc-publish@v3.3
-#        with:
-#          modrinth-id: Bi8o4aLw
-#          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-#          files: artifacts/${{ env.PRIMARY_FILE_GLOB }}
-#          version-type: ${{ env.VERSION_TYPE }}
-#          loaders: ${{ env.MOD_LOADERS }}
-#          game-versions: ${{ env.GAME_VERSIONS }}
-#          game-version-filter: ${{ env.GAME_VERSION_FILTER }}
-#          java: ${{ env.JAVA_VERSION }}
+
+  publish-to-github:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: github-actions
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: artifacts
+
+      - name: Publish to GitHub
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-prerelease: false
+          files: artifacts/${{ env.PRIMARY_FILE_GLOB }}
+          version-type: ${{ env.VERSION_TYPE }}
+          loaders: ${{ env.MOD_LOADERS }}
+          game-versions: ${{ env.GAME_VERSIONS }}
+          game-version-filter: ${{ env.GAME_VERSION_FILTER }}
+          java: ${{ env.JAVA_VERSION }}
+
+  publish-to-curseforge:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: github-actions
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: artifacts
+
+      - name: Publish to CurseForge
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          curseforge-id: 1214077
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          files: artifacts/${{ env.PRIMARY_FILE_GLOB }}
+          version-type: ${{ env.VERSION_TYPE }}
+          loaders: ${{ env.MOD_LOADERS }}
+          game-versions: ${{ env.GAME_VERSIONS }}
+          game-version-filter: ${{ env.GAME_VERSION_FILTER }}
+          java: ${{ env.JAVA_VERSION }}
+
+  publish-to-modrinth:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: github-actions
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: artifacts
+
+      - name: Publish to Modrinth
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: Bi8o4aLw
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          files: artifacts/${{ env.PRIMARY_FILE_GLOB }}
+          version-type: ${{ env.VERSION_TYPE }}
+          loaders: ${{ env.MOD_LOADERS }}
+          game-versions: ${{ env.GAME_VERSIONS }}
+          game-version-filter: ${{ env.GAME_VERSION_FILTER }}
+          java: ${{ env.JAVA_VERSION }}
