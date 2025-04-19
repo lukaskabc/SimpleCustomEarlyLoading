@@ -15,7 +15,7 @@ env:
     [1.21,1.21.4]
   GAME_VERSION_FILTER: releases
   VERSION_TYPE: release
-  PRIMARY_FILE_GLOB: build/libs/SimpleCustomEarlyLoading-*-neoforge.jar
+  PRIMARY_FILE_GLOB: SimpleCustomEarlyLoading-*-neoforge.jar
 
 jobs:
   build:
@@ -70,7 +70,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: ${{ env.PRIMARY_FILE_GLOB }}
+          path: build/libs/${{ env.PRIMARY_FILE_GLOB }}
 
   publish-to-github:
     needs: build
