@@ -43,7 +43,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           fail-on-cache-miss: true
-          path: ~/.m2/repository
+          path: ~/.m2/repository/japng/api
           key: japng-maven-repo-${{ runner.os }}
 
       - name: Debug - List all files in home directory
