@@ -10,7 +10,7 @@ I do not plan to continue in supporting other Forge versions due to technical re
 **For newer versions, please use the NeoForge.**
 See forge version description: [Releases](https://github.com/lukaskabc/SimpleCustomEarlyLoading/releases).
 
-![Preview](./preview.png)
+![Preview](./preview.gif)
 
 Currently, the window is not able to dynamically change its resolution when the window is resized.  
 I won't allow removing the Mojang logo.
