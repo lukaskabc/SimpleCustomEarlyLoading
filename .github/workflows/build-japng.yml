@@ -36,8 +36,11 @@ jobs:
       - name: Build and Install
         run: ./gradlew clean build publishToMavenLocal --info -x test
 
+      - name: Move repository
+        run: mv ~/.m2/repository/SimpleCustomEarlyLoading ~/.m2/repository/japng
+
       - name: Debug - List all files in home directory
-        run: find ~
+        run: find ~/.m2
 
       - name: Check if required Maven files exist
         run: |
@@ -48,5 +51,5 @@ jobs:
       - name: Update Cache
         uses: actions/cache/save@v4
         with:
-          path: ~/.m2/repository
+          path: ~/.m2/repository/japng/api
           key: japng-maven-repo-${{ runner.os }}
