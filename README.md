@@ -76,7 +76,7 @@ However, the red color of the original loading can be changed to black using
 
 ## Configuration:
 
-Place your images in the `config/simple_custom_early_loading` folder.
+Place your images in the `config/simple-custom-early-loading` folder.
 
 Then you can edit the configuration file `config/simple-custom-early-loading.json`.  
 You can find default
