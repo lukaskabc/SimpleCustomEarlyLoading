@@ -25,16 +25,19 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.opengl.GL11C.glClearColor;
 
 public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
-    public static final String EXPECTED_WINDOW_PROVIDER = "fmlearlywindow";
+    public static final String WINDOW_PROVIDER = "SimpleCustomEarlyLoading";
     private static final Logger LOG = LogManager.getLogger();
     private final RefDisplayWindow accessor;
     private final Config configuration;
@@ -47,14 +50,14 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
     }
 
     /**
-     * Checks whether the FML configuration has the {@link #EXPECTED_WINDOW_PROVIDER} set as the {@link FMLConfig.ConfigValue#EARLY_WINDOW_PROVIDER EARLY_WINDOW_PROVIDER}.
+     * Checks whether the FML configuration has the {@link #WINDOW_PROVIDER} set as the {@link FMLConfig.ConfigValue#EARLY_WINDOW_PROVIDER EARLY_WINDOW_PROVIDER}.
      * <p>
      * If the value does not match,
      * an error message dialog is displayed to instruct the user to update the config.
      */
     private static void checkFMLConfig() {
         final String windowProvider = FMLConfig.getConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER);
-        if (!EXPECTED_WINDOW_PROVIDER.equals(windowProvider)) {
+        if (!WINDOW_PROVIDER.equals(windowProvider)) {
             // Create a parent frame that will appear in the taskbar
             final JFrame frame = new JFrame("Missing Forge configuration");
             frame.setAlwaysOnTop(true);
@@ -72,7 +75,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
                             
                             Do you wish to update the config?
                             Answering yes will update the config and exit the game.
-                            """.replace("WINDOW_PROVIDER", EXPECTED_WINDOW_PROVIDER),
+                            """.replace("WINDOW_PROVIDER", WINDOW_PROVIDER),
                     "Missing NeoForge configuration",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE
@@ -81,7 +84,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
             frame.dispose();
 
             if (answer == JOptionPane.YES_OPTION) {
-                FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, EXPECTED_WINDOW_PROVIDER);
+                FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_PROVIDER, WINDOW_PROVIDER);
                 System.exit(0);
             }
         }
@@ -146,67 +149,54 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      */
     @Override
     public String name() {
-        return EXPECTED_WINDOW_PROVIDER;
+        return WINDOW_PROVIDER;
     }
 
     /**
-     * In Forge context should never be called.
+     * Calls the super method and sets the colour scheme to black.
      *
-     * @throws AssertionError always
-     * @see #reinitializeAfterStateCopy()
+     * @param arguments The arguments provided to the Java process.
+     *                  This is the entire command line, so you can process stuff from it.
+     * @return result of the super method
+     * @see DisplayWindow#initialize(String[])
      */
     @Override
     public Runnable initialize(String[] arguments) {
-        throw new AssertionError("The Simple Custom Early Loading Window should not be initialized in Forge context!");
+        final Runnable result = super.initialize(arguments);
+        // force black colour scheme
+        accessor.setColourScheme(ColourScheme.BLACK);
+        return result;
     }
 
     /**
-     * In Forge context should never be called.
+     * Reimplements the super method {@link DisplayWindow#start(String, String)}<br>
+     * and injects {@link #afterInitRender()}<br>
+     * that is called after {@link DisplayWindow#initRender(String, String)}
+     * <p>
+     * Starts the loading window rendering process.
+     * <p>
+     * Schedules the window's rendering initialization and sets up a periodic tick.
      *
-     * @throws AssertionError always
-     * @see #reinitializeAfterStateCopy()
+     * @param mcVersion    The Minecraft version.
+     * @param forgeVersion The Forge version.
+     * @return A Runnable responsible for the periodic tick.
+     * @see DisplayWindow#start(String, String)
      */
     @Override
     public Runnable start(String mcVersion, String forgeVersion) {
-        throw new AssertionError("The Simple Custom Early Loading Window should not be initialized in Forge context!");
-    }
+        final ScheduledExecutorService renderScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+            final Thread thread = Executors.defaultThreadFactory().newThread(r);
+            thread.setDaemon(true);
+            return thread;
+        });
+        accessor.setRenderScheduler(renderScheduler);
+        initWindow(mcVersion);
 
-    public Runnable reinitializeAfterStateCopy() {
-        // from initialize method
-        accessor.setColourScheme(ColourScheme.BLACK);
-        // from start method
-        final var future = accessor.getRenderScheduler().schedule(() -> {
-            try {
-                accessor.getRenderLock().acquire(); // block rendering
-            } catch (final InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return;
-            }
-
-            // from initWindow
-            // rebind callbacks to the new instance
-            glfwSetFramebufferSizeCallback(accessor.getGlWindow(), accessor::fbResize);
-            glfwSetWindowPosCallback(accessor.getGlWindow(), accessor::winMove);
-            glfwSetWindowSizeCallback(accessor.getGlWindow(), accessor::winResize);
-
-            // cancel the old window tick
-            if (accessor.getWindowTick() != null) {
-                while (!accessor.getWindowTick().isDone()) {
-                    accessor.getWindowTick().cancel(false);
-                }
-            } else {
-                // TODO: this is potentially a problem, if the window tick was null,
-                //  then the window was already handed over to the game
-                LOG.error("Early window was already handed over to the game - that was fast! Aborting Simple Custom Early Loading initialization.");
-                return;
-            }
-            // from initRender
-            accessor.setWindowTick(accessor.getRenderScheduler().scheduleAtFixedRate(accessor::renderThreadFunc, 50, 50, TimeUnit.MILLISECONDS));
-            accessor.getRenderScheduler().scheduleAtFixedRate(() -> accessor.getAnimationTimerTrigger().set(true), 1, 50, TimeUnit.MILLISECONDS);
+        final var initializationFuture = renderScheduler.schedule(() -> {
+            accessor.initRender(mcVersion, forgeVersion);
             afterInitRender();
-            accessor.getRenderLock().release();
         }, 1, TimeUnit.MILLISECONDS);
-        accessor.setInitializationFuture(future);
+        accessor.setInitializationFuture(initializationFuture);
         return this::periodicTick;
     }
 
