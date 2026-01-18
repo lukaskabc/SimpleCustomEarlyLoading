@@ -1,5 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection;
 
+import net.neoforged.fml.earlydisplay.EarlyFramebuffer;
 import net.neoforged.fml.earlydisplay.RenderElement;
 
 import java.lang.invoke.MethodHandle;
@@ -28,7 +29,7 @@ public class RefEarlyFrameBuffer {
         }
     }
 
-    public static void close(Object earlyFramebuffer) {
+    public static void close(EarlyFramebuffer earlyFramebuffer) {
         try {
             close.invoke(earlyFramebuffer);
         } catch (Throwable e) {

@@ -7,10 +7,7 @@ import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.ele
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefEarlyFrameBuffer;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefPerformanceInfo;
-import net.neoforged.fml.earlydisplay.ColourScheme;
-import net.neoforged.fml.earlydisplay.DisplayWindow;
-import net.neoforged.fml.earlydisplay.RenderElement;
-import net.neoforged.fml.earlydisplay.SimpleFont;
+import net.neoforged.fml.earlydisplay.*;
 import net.neoforged.fml.loading.FMLConfig;
 import net.neoforged.neoforgespi.earlywindow.ImmediateWindowProvider;
 import org.apache.logging.log4j.LogManager;
@@ -29,8 +26,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
-import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements ImmediateWindowProvider {
     public static final String WINDOW_PROVIDER = "SimpleCustomEarlyLoading";
@@ -210,12 +206,41 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         });
         accessor.setRenderScheduler(renderScheduler);
         initWindow(mcVersion);
+
+        glfwSetFramebufferSizeCallback(accessor.getGlWindow(), (window, width, height) -> {
+            width = size(width);
+            height = size(height);
+            if (accessor.getFbWidth() != width || accessor.getFbHeight() != height) {
+                accessor.setFBSize(width, height);
+                if (!configuration.hasCustomResolution()) {
+                    accessor.getRenderScheduler().schedule(this::recreateContext, 1, TimeUnit.MILLISECONDS);
+                }
+            }
+        });
+
         final var initializationFuture = renderScheduler.schedule(() -> {
             accessor.initRender(mcVersion, forgeVersion);
             afterInitRender(mcVersion, forgeVersion);
         }, 1, TimeUnit.MILLISECONDS);
         accessor.setInitializationFuture(initializationFuture);
         return this::periodicTick;
+    }
+
+    @Override
+    public void render(int alpha) {
+        final int[] width = new int[1];
+        final int[] height = new int[1];
+        glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
+        width[0] = size(width[0]);
+        height[0] = size(height[0]);
+        if (accessor.getFbWidth() != width[0] ||
+                accessor.getWinWidth() != width[0] ||
+                accessor.getFbHeight() != height[0] ||
+                accessor.getWinHeight() != height[0]) {
+            recreateDisplayContext();
+            recreateFramebuffer();
+        }
+        super.render(alpha);
     }
 
     /**
@@ -230,8 +255,8 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      * with other scheduled tasks.
      */
     private void afterInitRender(String mcVersion, String forgeVersion) {
-        glfwMakeContextCurrent(accessor.getGlWindow());
         recreateContext();
+        glfwMakeContextCurrent(accessor.getGlWindow());
         final List<RenderElement> elements = accessor.getElements();
         elements.clear();
         constructElements(mcVersion, forgeVersion, elements);
@@ -267,27 +292,18 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         accessor.getElements().addLast(RenderElement.mojang(textureId, accessor.getFrameCount()));
     }
 
-    /**
-     * Recreates the rendering context overriding the frame buffer resolution set by the original DisplayWindow implementation.
-     * <p>
-     * Updates the frame buffer size according to OpenGL window frame buffer size,
-     * creates a new display context, sets up a new frame buffer,
-     * and updates the center position based on the scaled context dimensions.
-     * <p>
-     * The old frame buffer is closed to release the resources.
-     */
-    private void recreateContext() {
+    private void recreateDisplayContext() {
         final RenderElement.DisplayContext oldContext = accessor.getContext();
-        final Object oldFrameBuffer = accessor.getFramebuffer();
         final int[] width = new int[1];
         final int[] height = new int[1];
 
         glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
+        width[0] = size(width[0]);
+        height[0] = size(height[0]);
         accessor.setFBSize(width[0], height[0]);
+        accessor.setWindowSize(width[0], height[0]);
 
-        LOG.debug("The available size of the framebuffer in the window is {}x{}", width[0], height[0]);
-
-        if (configuration.getResolutionWidth() > 0 && configuration.getResolutionHeight() > 0) {
+        if (configuration.hasCustomResolution()) {
             width[0] = configuration.getResolutionWidth();
             height[0] = configuration.getResolutionHeight();
         }
@@ -301,7 +317,34 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
                 oldContext.performance()
         );
         accessor.setContext(context);
+    }
+
+    private void recreateFramebuffer() {
+        final RenderElement.DisplayContext context = accessor.getContext();
+        final EarlyFramebuffer oldFrameBuffer = accessor.getFramebuffer();
         accessor.setFrameBuffer(RefEarlyFrameBuffer.constructor(context));
         RefEarlyFrameBuffer.close(oldFrameBuffer);
+    }
+
+    /**
+     * Recreates the rendering context overriding the frame buffer resolution set by the original DisplayWindow implementation.
+     * <p>
+     * Updates the frame buffer size according to OpenGL window frame buffer size,
+     * creates a new display context, sets up a new frame buffer,
+     * and updates the center position based on the scaled context dimensions.
+     * <p>
+     * The old frame buffer is closed to release the resources.
+     */
+    private void recreateContext() {
+        accessor.getRenderLock().acquireUninterruptibly();
+        glfwMakeContextCurrent(accessor.getGlWindow());
+        recreateDisplayContext();
+        recreateFramebuffer();
+        glfwMakeContextCurrent(0);
+        accessor.getRenderLock().release();
+    }
+
+    private int size(int size) {
+        return Math.max(1, size);
     }
 }
