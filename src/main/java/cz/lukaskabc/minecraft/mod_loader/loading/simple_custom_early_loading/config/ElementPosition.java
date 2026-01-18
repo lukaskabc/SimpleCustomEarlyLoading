@@ -49,6 +49,8 @@ public class ElementPosition implements BoundsResolver {
      */
     private float height = Float.NaN;
 
+    private boolean keepAspectRatio = true;
+
     /**
      * Checks whether the element has a width set.
      *
@@ -105,16 +107,56 @@ public class ElementPosition implements BoundsResolver {
         }
     }
 
+    /**
+     * Applies "cover" scaling when keepAspectRatio is enabled and both width and height are specified.
+     * The content is scaled to cover the entire bounding box while maintaining aspect ratio.
+     * This may result in some parts of the content being cropped.
+     *
+     * @param elementWidth  the original width of the element texture
+     * @param elementHeight the original height of the element texture
+     * @param boxWidth      the width of the bounding box
+     * @param boxHeight     the height of the bounding box
+     * @param output        array where output[2] = width, output[3] = height
+     */
+    private void applyCoverScaling(int elementWidth, int elementHeight, int boxWidth, int boxHeight, int[] output) {
+        float elementAspect = (float) elementWidth / elementHeight;
+        float boxAspect = (float) boxWidth / boxHeight;
+
+        if (elementAspect > boxAspect) {
+            // Element is wider than box (relative to their heights)
+            // Scale by height to cover, width will exceed box width
+            output[3] = boxHeight;
+            output[2] = Math.round(boxHeight * elementAspect);
+        } else {
+            // Element is taller than box (relative to their widths)
+            // Scale by width to cover, height will exceed box height
+            output[2] = boxWidth;
+            output[3] = Math.round(boxWidth / elementAspect);
+        }
+    }
+
     private void resolveSize(int elementWidth, int elementHeight, int screenWidth, int screenHeight, int[] output) {
         assert output.length >= 4;
 
-        output[2] = getSafeWidth(elementWidth, elementHeight);
-        output[3] = getSafeHeight(elementWidth, elementHeight);
+        int resolvedWidth;
+        int resolvedHeight;
+
         if (sizeUnit == Unit.PERCENTAGE) {
-            output[2] = getRelativeWidth(elementWidth, elementHeight, screenWidth, screenHeight);
-            output[3] = getRelativeHeight(elementWidth, elementHeight, screenWidth, screenHeight);
-        } else if (sizeUnit != Unit.PIXELS) {
+            resolvedWidth = getRelativeWidth(elementWidth, elementHeight, screenWidth, screenHeight);
+            resolvedHeight = getRelativeHeight(elementWidth, elementHeight, screenWidth, screenHeight);
+        } else if (sizeUnit == Unit.PIXELS) {
+            resolvedWidth = getSafeWidth(elementWidth, elementHeight);
+            resolvedHeight = getSafeHeight(elementWidth, elementHeight);
+        } else {
             throw new ConfigurationException("Invalid size unit: " + sizeUnit);
+        }
+
+        output[2] = resolvedWidth;
+        output[3] = resolvedHeight;
+
+        // Apply cover scaling when keepAspectRatio is enabled and both dimensions are explicitly set
+        if (keepAspectRatio && hasWidth() && hasHeight()) {
+            applyCoverScaling(elementWidth, elementHeight, resolvedWidth, resolvedHeight, output);
         }
     }
 
@@ -223,6 +265,14 @@ public class ElementPosition implements BoundsResolver {
 
     public void setPositionAnchor(ElementAnchor positionAnchor) {
         this.positionAnchor = positionAnchor;
+    }
+
+    public boolean isKeepAspectRatio() {
+        return keepAspectRatio;
+    }
+
+    public void setKeepAspectRatio(boolean keepAspectRatio) {
+        this.keepAspectRatio = keepAspectRatio;
     }
 
     public enum Unit {
