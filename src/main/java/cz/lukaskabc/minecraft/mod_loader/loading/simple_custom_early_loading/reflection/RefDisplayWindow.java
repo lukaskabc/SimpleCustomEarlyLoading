@@ -31,6 +31,7 @@ public class RefDisplayWindow {
     private static final VarHandle maximized = findField(lookup, "maximized", boolean.class);
     private static final VarHandle fbWidth = findField(lookup, "fbWidth", int.class);
     private static final VarHandle fbHeight = findField(lookup, "fbHeight", int.class);
+    private static final VarHandle fbScale = findField(lookup, "fbScale", int.class);
     private static final VarHandle context = findField(lookup, "context", RenderElement.DisplayContext.class);
     private static final VarHandle framebuffer = findField(lookup, "framebuffer", EarlyFramebuffer.class);
     private static final VarHandle framecount = findField(lookup, "framecount", int.class);
@@ -39,6 +40,7 @@ public class RefDisplayWindow {
     private static final VarHandle windowTick = findField(lookup, "windowTick", ScheduledFuture.class);
     private static final VarHandle winWidth = findField(lookup, "winWidth", int.class);
     private static final VarHandle winHeight = findField(lookup, "winHeight", int.class);
+    private static final VarHandle performanceInfo = findField(lookup, "performanceInfo", PerformanceInfo.class);
     private final DisplayWindow target;
 
     public RefDisplayWindow(DisplayWindow displayWindow) {
@@ -178,5 +180,18 @@ public class RefDisplayWindow {
 
     public int getWinHeight() {
         return (int) winHeight.get(target);
+    }
+
+    public void setWindowSize(int width, int height) {
+        winWidth.set(target, width);
+        winHeight.set(target, height);
+    }
+
+    public void setFBScale(int scale) {
+        fbScale.set(target, scale);
+    }
+
+    public void setPerformanceInfo(PerformanceInfo value) {
+        performanceInfo.set(target, value);
     }
 }

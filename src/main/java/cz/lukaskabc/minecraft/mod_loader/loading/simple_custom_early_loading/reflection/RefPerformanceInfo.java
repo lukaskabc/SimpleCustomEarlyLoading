@@ -16,6 +16,14 @@ public class RefPerformanceInfo {
         throw new AssertionError();
     }
 
+    public static PerformanceInfo create() {
+        try {
+            return (PerformanceInfo) findConstructor(lookup).invoke();
+        } catch (Throwable e) {
+            throw new ReflectionException(e);
+        }
+    }
+
     public String text(PerformanceInfo target) {
         return (String) text.get(target);
     }

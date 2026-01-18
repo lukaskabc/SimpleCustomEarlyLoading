@@ -6,6 +6,7 @@ import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.ele
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StaticTextureElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefEarlyFrameBuffer;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefPerformanceInfo;
 import net.neoforged.fml.earlydisplay.ColourScheme;
 import net.neoforged.fml.earlydisplay.DisplayWindow;
 import net.neoforged.fml.earlydisplay.RenderElement;
@@ -162,10 +163,28 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      */
     @Override
     public Runnable initialize(String[] arguments) {
-        final Runnable result = super.initialize(arguments);
-        // force black colour scheme
+        try {
+            final Runnable result = super.initialize(arguments);
+            // force black colour scheme
+            accessor.setColourScheme(ColourScheme.BLACK);
+            return result;
+        } catch (Exception e) {
+            LOG.error("Error initializing early display window, the game will attempt to continue to start.", e);
+            initDefault();
+            LOG.warn("Early window initialized with minimal default values, proceeding to start with unknown game and forge versions.");
+            return start("unknown", "unknown");
+        }
+    }
+
+    /**
+     * Alternative to {@link #initialize(String[])}
+     * that initialize minimal objects attributes required to avoid crash.
+     */
+    private void initDefault() {
+        accessor.setWindowSize(854, 480);
+        accessor.setFBScale(1);
         accessor.setColourScheme(ColourScheme.BLACK);
-        return result;
+        accessor.setPerformanceInfo(RefPerformanceInfo.create());
     }
 
     /**
