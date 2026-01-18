@@ -21,7 +21,9 @@ public class ConfigLoader {
     private static final Logger LOG = LogManager.getLogger();
 
     private static final Gson GSON = new GsonBuilder()
-            .setFieldNamingStrategy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+            .setFieldNamingStrategy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .registerTypeAdapter(Element.class, new ElementDeserializer())
+            .create();
 
     private ConfigLoader() {
         throw new AssertionError();
