@@ -80,5 +80,9 @@ public class Config {
     public void setResolutionHeight(int resolutionHeight) {
         this.resolutionHeight = resolutionHeight;
     }
+    
+    public boolean hasCustomResolution() {
+        return getResolutionWidth() > 0 && getResolutionHeight() > 0;
+    }
 
 }
