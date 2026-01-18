@@ -166,10 +166,16 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      */
     @Override
     public Runnable initialize(String[] arguments) {
-        final Runnable result = super.initialize(arguments);
-        // force black colour scheme
-        accessor.setColourScheme(ColourScheme.BLACK);
-        return result;
+        try {
+            final Runnable result = super.initialize(arguments);
+            // force black colour scheme
+            accessor.setColourScheme(ColourScheme.BLACK);
+            return result;
+        } catch (Exception e) {
+            LOG.error("Error initializing early display window, the game will attempt to continue to start.", e);
+            return () -> {
+            };
+        }
     }
 
     /**
