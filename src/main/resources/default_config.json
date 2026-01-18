@@ -7,6 +7,8 @@
     // lower elements will be rendered over the higher ones
     {
       // example background
+      // you can also specify multiple images from which a random one will be picked
+      // "image": ["stellarview.png", "another.png", "yet_another.png"],
       "image": "stellarview.png",
       "position": {
         // define which point in the image should be aligned at x, y position on the window

@@ -1,9 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading;
 
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.Config;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigLoader;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigurationException;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.Element;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.*;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.ApngTextureElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StartupProgressBar;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StaticTextureElement;
@@ -91,6 +88,13 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
     }
 
     private Supplier<RenderElement> constructElement(Element element) {
+        if (element.getType() == Element.Type.IMAGE) {
+            return constructImageElement((ImageElement) element);
+        }
+        throw new IllegalStateException("Unknown element type: " + element.getType());
+    }
+
+    private Supplier<RenderElement> constructImageElement(ImageElement element) {
         // yes, sure, I could use abstract factories, but lets keep it simple
         if (ApngTextureElement.SUPPORTED_EXTENSIONS.contains(element.getExtension())) {
             return new ApngTextureElement(element.getImage(), element.getPosition());
