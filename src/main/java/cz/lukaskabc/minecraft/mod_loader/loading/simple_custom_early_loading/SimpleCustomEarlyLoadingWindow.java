@@ -238,7 +238,6 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         // Set the clear color based on the colour scheme
         final ColourScheme colourScheme = accessor.getColourScheme();
         glClearColor(colourScheme.background().redf(), colourScheme.background().greenf(), colourScheme.background().bluef(), 1f);
-        recreateContext();
         final List<RenderElement> elements = accessor.getElements();
         constructElements(elements);
         glfwMakeContextCurrent(0);
@@ -303,7 +302,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         width[0] = size(width[0]);
         height[0] = size(height[0]);
         accessor.setFBSize(width[0], height[0]);
-        accessor.setWindowSize(width[0], height[0]);
+        accessor.winResize(accessor.getGlWindow(), width[0], height[0]);
 
         if (configuration.hasCustomResolution()) {
             width[0] = configuration.getResolutionWidth();
