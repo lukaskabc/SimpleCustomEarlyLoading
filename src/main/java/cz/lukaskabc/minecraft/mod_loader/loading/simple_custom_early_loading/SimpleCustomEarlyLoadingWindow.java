@@ -224,18 +224,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
 
     @Override
     public void render(int alpha) {
-        final int[] width = new int[1];
-        final int[] height = new int[1];
-        glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
-        width[0] = size(width[0]);
-        height[0] = size(height[0]);
-        if (accessor.getFbWidth() != width[0] ||
-                accessor.getWinWidth() != width[0] ||
-                accessor.getFbHeight() != height[0] ||
-                accessor.getWinHeight() != height[0]) {
-            recreateDisplayContext();
-            recreateFramebuffer();
-        }
+        resizeWhenNeeded();
         super.render(alpha);
     }
 
@@ -286,6 +275,27 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
     @Override
     public void addMojangTexture(int textureId) {
         accessor.getElements().add(RenderElement.mojang(textureId, accessor.getFrameCount()));
+    }
+
+    @Override
+    public void periodicTick() {
+        resizeWhenNeeded();
+        super.periodicTick();
+    }
+
+    private void resizeWhenNeeded() {
+        final int[] width = new int[1];
+        final int[] height = new int[1];
+        glfwGetFramebufferSize(accessor.getGlWindow(), width, height);
+        width[0] = size(width[0]);
+        height[0] = size(height[0]);
+        if (accessor.getFbWidth() != width[0] ||
+                accessor.getWinWidth() != width[0] ||
+                accessor.getFbHeight() != height[0] ||
+                accessor.getWinHeight() != height[0]) {
+            recreateDisplayContext();
+            recreateFramebuffer();
+        }
     }
 
     private void recreateDisplayContext() {
