@@ -5,10 +5,8 @@ import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.ele
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StartupProgressBar;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StaticTextureElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefDisplayWindow;
-import net.minecraftforge.fml.earlydisplay.ColourScheme;
-import net.minecraftforge.fml.earlydisplay.DisplayWindow;
-import net.minecraftforge.fml.earlydisplay.RenderElement;
-import net.minecraftforge.fml.earlydisplay.SimpleFont;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefEarlyFrameBuffer;
+import net.minecraftforge.fml.earlydisplay.*;
 import net.minecraftforge.fml.loading.FMLConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.ImmediateWindowProvider;
@@ -307,7 +305,7 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
         width[0] = size(width[0]);
         height[0] = size(height[0]);
         accessor.setFBSize(width[0], height[0]);
-        accessor.setWindowSize(width[0], height[0]);
+        accessor.winResize(accessor.getGlWindow(), width[0], height[0]);
 
         if (configuration.hasCustomResolution()) {
             width[0] = configuration.getResolutionWidth();
@@ -328,6 +326,8 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
     private void recreateFramebuffer() {
         final RenderElement.DisplayContext context = accessor.getContext();
         final EarlyFramebuffer oldFrameBuffer = accessor.getFramebuffer();
+        accessor.setFrameBuffer(RefEarlyFrameBuffer.constructor(context));
+        RefEarlyFrameBuffer.close(oldFrameBuffer);
     }
 
     /**
@@ -340,12 +340,10 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
      * The old frame buffer is closed to release the resources.
      */
     private void recreateContext() {
-        accessor.getRenderLock().acquireUninterruptibly();
         glfwMakeContextCurrent(accessor.getGlWindow());
         recreateDisplayContext();
         recreateFramebuffer();
         glfwMakeContextCurrent(0);
-        accessor.getRenderLock().release();
     }
 
     private int size(int size) {
