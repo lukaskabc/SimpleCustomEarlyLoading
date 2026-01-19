@@ -22,6 +22,7 @@
         "y": 0,
         // The unit for width, height - PIXELS or PERCENTAGE (again, percantage of the window) - can't be defined separately
         "size_unit": "PERCENTAGE",
+        // "keep_aspect_ratio": false, // to disable maintaining aspect ratio (enabled by default)
         // The width and height of the image in size_unit
         // if you specify both values, the aspect ratio is not preserved
         // if you specify only one value, the other is calculated to preserve the aspect ratio
