@@ -15,8 +15,13 @@ class ElementDeserializer implements JsonDeserializer<Element> {
         switch (type) {
             case IMAGE:
                 return deserializeImage(jsonObject, typeOfT, context);
+            case GAME_LOADING_IMAGE:
+                return new GameLoadingElement(deserializeImage(jsonObject, typeOfT, context));
+            case TOTAL_LOADING_IMAGE:
+                return new TotalLoadingElement(deserializeImage(jsonObject, typeOfT, context));
+            default:
+                throw new ConfigurationException("Unknown element type: " + type);
         }
-        throw new IllegalStateException("Unknown element type: " + type);
     }
 
     public Element.Type resolveType(JsonObject jsonObject) {

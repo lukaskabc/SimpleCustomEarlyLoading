@@ -3,6 +3,13 @@ package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.co
 public abstract class ImageElement extends Element {
     private ElementPosition position;
 
+    public ImageElement() {
+    }
+
+    public ImageElement(Type type) {
+        super(type);
+    }
+
     public ElementPosition getPosition() {
         return position;
     }

@@ -2,6 +2,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.el
 
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.BoundsResolver;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigurationException;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ImageElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.ApngSTBHelper;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.ApngTexture;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.CSB;
@@ -18,17 +19,18 @@ import java.util.Set;
 import static cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StaticTextureElement.COLOR;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 
-public class ApngTextureElement implements ElementSupplier {
+public class ApngTextureElement extends ElementSupplier {
     public static final Set<String> SUPPORTED_EXTENSIONS = Set.of("apng");
 
-    private final ApngTexture apngTexture;
-    private final BoundsResolver boundsResolver;
-    private long lastFrameTime;
+    protected final ApngTexture apngTexture;
+    protected final BoundsResolver boundsResolver;
+    protected long lastFrameTime;
 
-    public ApngTextureElement(String texture, BoundsResolver boundsResolver) {
-        this.boundsResolver = boundsResolver;
+    public ApngTextureElement(ImageElement element) {
+        super(element.getDisplayConditions());
+        this.boundsResolver = element.getPosition();
         try {
-            apngTexture = ApngSTBHelper.resolveAndBindApngTexture(texture);
+            apngTexture = ApngSTBHelper.resolveAndBindApngTexture(element.getImage());
         } catch (FileNotFoundException | PngException e) {
             Log.error("Failed to load texture: ", e.getMessage());
             throw new ConfigurationException(e);
@@ -55,14 +57,16 @@ public class ApngTextureElement implements ElementSupplier {
      * and if it exceeds the delay of the current frame,
      * it advances to the next frame.
      */
-    private void nextFrame() {
+    protected boolean nextFrame() {
         if (System.currentTimeMillis() - lastFrameTime > apngTexture.getCurrentDelay() * 1000) {
             apngTexture.nextFrame();
             lastFrameTime = System.currentTimeMillis();
+            return true;
         }
+        return false;
     }
 
-    private float[] getUV() {
+    protected float[] getUV() {
         final float[] uv = new float[4];
         final int[] currentTextureSize = apngTexture.getCurrentTextureSize();
         uv[0] = apngTexture.getCurrentTextureXOffset() / (float) currentTextureSize[0];

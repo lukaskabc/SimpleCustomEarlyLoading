@@ -4,6 +4,8 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.condition.ConditionDeserializer;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.condition.DisplayCondition;
 import net.neoforged.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,6 +25,7 @@ public class ConfigLoader {
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingStrategy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .registerTypeAdapter(Element.class, new ElementDeserializer())
+            .registerTypeAdapter(DisplayCondition.class, new ConditionDeserializer())
             .create();
 
     private ConfigLoader() {
