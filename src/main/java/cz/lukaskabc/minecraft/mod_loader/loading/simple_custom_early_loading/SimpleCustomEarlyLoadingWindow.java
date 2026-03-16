@@ -1,9 +1,7 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.*;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.ApngTextureElement;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StartupProgressBar;
-import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.StaticTextureElement;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.elements.*;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefDisplayWindow;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.RefEarlyFrameBuffer;
 import net.minecraftforge.fml.earlydisplay.*;
@@ -84,19 +82,25 @@ public class SimpleCustomEarlyLoadingWindow extends DisplayWindow implements Imm
     }
 
     private Supplier<RenderElement> constructElement(Element element) {
-        if (element.getType() == Element.Type.IMAGE) {
-            return constructImageElement((ImageElement) element);
+        switch (element.getType()) {
+            case IMAGE:
+                return constructImageElement((ImageElement) element);
+            case GAME_LOADING_IMAGE:
+                return new MinecraftLoadingApngTextureElement((GameLoadingElement) element);
+            case TOTAL_LOADING_IMAGE:
+                return new TotalLoadingApngTextureElement((TotalLoadingElement) element);
+            default:
+                throw new IllegalStateException("Unknown element type: " + element.getType());
         }
-        throw new IllegalStateException("Unknown element type: " + element.getType());
     }
 
     private Supplier<RenderElement> constructImageElement(ImageElement element) {
         // yes, sure, I could use abstract factories, but lets keep it simple
         if (ApngTextureElement.SUPPORTED_EXTENSIONS.contains(element.getExtension())) {
-            return new ApngTextureElement(element.getImage(), element.getPosition());
+            return new ApngTextureElement(element);
         }
         if (StaticTextureElement.SUPPORTED_EXTENSIONS.contains(element.getExtension())) {
-            return new StaticTextureElement(element.getImage(), element.getPosition());
+            return new StaticTextureElement(element);
         }
         throw new ConfigurationException("Unsupported image extension: " + element.getExtension());
     }

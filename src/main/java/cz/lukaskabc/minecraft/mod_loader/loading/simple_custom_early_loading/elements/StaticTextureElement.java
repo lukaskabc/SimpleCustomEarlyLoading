@@ -2,6 +2,7 @@ package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.el
 
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.BoundsResolver;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ConfigurationException;
+import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.ImageElement;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.StaticSTBHelper;
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.reflection.CSB;
 import net.minecraftforge.fml.earlydisplay.ElementShader;
@@ -18,7 +19,7 @@ import static org.lwjgl.opengl.GL32C.GL_TEXTURE_2D;
 /**
  * Renders a single static texture.
  */
-public class StaticTextureElement implements ElementSupplier {
+public class StaticTextureElement extends ElementSupplier {
     public static final Set<String> SUPPORTED_EXTENSIONS = Set.of(
             "jpg", "jpeg",
             "png",
@@ -37,12 +38,13 @@ public class StaticTextureElement implements ElementSupplier {
     private final int textureId;
     private final BoundsResolver boundsResolver;
 
-    public StaticTextureElement(String texture, BoundsResolver boundsResolver) {
+    public StaticTextureElement(ImageElement element) {
+        super(element.getDisplayConditions());
         final int[] textureWidth = new int[1];
         final int[] textureHeight = new int[1];
-        this.boundsResolver = boundsResolver;
+        this.boundsResolver = element.getPosition();
         try {
-            textureId = StaticSTBHelper.resolveAndBindTexture(texture, textureWidth, textureHeight);
+            textureId = StaticSTBHelper.resolveAndBindTexture(element.getImage(), textureWidth, textureHeight);
         } catch (FileNotFoundException e) {
             Log.error("Failed to load texture: ", e.getMessage());
             throw new ConfigurationException(e);
