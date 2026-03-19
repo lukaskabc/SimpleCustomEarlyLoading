@@ -36,7 +36,7 @@ public class LoadingStageCondition extends DisplayCondition {
     }
 
     @Override
-    public boolean shouldDisplay() {
+    public boolean shouldDisplayImpl() {
         Set<String> labels = StartupNotificationManager.getCurrentProgress().stream()
                 .flatMap(meter -> Stream.of(nameOrEmpty(meter), labelOrEmpty(meter)))
                 .filter(Objects::nonNull).collect(Collectors.toSet());

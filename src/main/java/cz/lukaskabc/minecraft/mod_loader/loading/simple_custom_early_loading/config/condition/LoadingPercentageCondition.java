@@ -33,7 +33,7 @@ public class LoadingPercentageCondition extends DisplayCondition {
     }
 
     @Override
-    public boolean shouldDisplay() {
+    public boolean shouldDisplayImpl() {
         List<ProgressMeter> currentProgress = StartupNotificationManager.getCurrentProgress();
         final double mcProgress = (int) (LoadingProgressHelper.getMinecraftProgress(currentProgress) * 100f);
         return minHolds(mcProgress) && maxHolds(mcProgress);
