@@ -120,6 +120,60 @@ and [ScreenToGif application](https://www.screentogif.com/).
 For creating APNG animations, I recommend using [ScreenToGif application](https://www.screentogif.com/).
 During export, you need to **uncheck** the "Detect unchanged pixels" option.
 
+## Display conditions
+
+Since version 2.2, it is possible to specify display conditions for each element.
+
+```json
+"display_conditions": [
+    // a list of conditions, when any of the conditions is met, the element will be rendered
+    {
+      "type": "LOADING_PERCENTAGE", // renders the element when the Minecraft loading progress percentage is in the defined range
+      "minimum": 0,
+      "minimumInclusive": false,
+      "maximum": 50,
+      "maximumInclusive": true,
+    },
+    {
+    "type": "LOADING_STAGE", // renders the element when any active loading stage contains any of the defined keywords (stages below)
+    // the match is not case sensitive
+    "stages": [
+      // Note that some stages may occure concurently or in a different order
+      // some of the options for example are:
+      "Scanning mod candidates",
+      "Launching minecraft",
+      "Loading bootstrap resources",
+      "Loading mods",
+      "Mod Construction",
+      "Mod Construction: Deferred Queue",
+      "Registry initialization",
+      "Config loading",
+      "Minecraft Progress",
+      "Sided setup"
+    ]
+  }
+],
+```
+
+## Custom loading textures
+Since version 2.3, it is possible to use APNG textures that will be rendered based on the loading progress percentage.
+Each frame of the APNG texture will be rendered based on the current loading progress percentage.
+If APNG has 100 frames, each frame will be rendered for 1% of the loading progress.
+
+- `GAME_LOADING_IMAGE` uses minecraft loading progress, note that this progress is AFTER the early loading
+- `TOTAL_LOADING_IMAGE` uses heuristic based on known loading phases to estimate the total loading progress,
+                    that includes the early loading AND minecraft loading in total
+
+```json
+{
+  "image": "loading.apng",
+  "type": "TOTAL_LOADING_IMAGE" // or "GAME_LOADING_IMAGE"
+  "position": {
+    // ...
+  }
+}
+```
+
 # Development
 
 This is a simplified version of [StargateEarlyLoading mod](https://github.com/lukaskabc/StargateEarlyLoading).
