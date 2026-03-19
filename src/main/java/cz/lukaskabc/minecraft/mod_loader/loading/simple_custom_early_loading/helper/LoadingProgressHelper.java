@@ -1,8 +1,6 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper;
 
-import net.neoforged.fml.loading.progress.ProgressMeter;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.minecraftforge.fml.loading.progress.ProgressMeter;
 
 import java.util.List;
 import java.util.Set;
@@ -16,19 +14,22 @@ public class LoadingProgressHelper {
      * Note that some of them occur concurrently and their order should not be considered as reliable.
      */
     public static final Set<String> EARLY_LABELS = Stream.of(
+            "EARLY",
+            "Discovering mod files",
+            "Loaded language provider",
             "Scanning mod candidates",
             "Launching minecraft",
             "Loading bootstrap resources",
             "Loading mods",
-            "Mod Construction",
-            "Mod Construction: Deferred Queue",
-            "Registry initialization",
-            "Config loading",
-            MINECRAFT_PROGRESS,
-            "Sided setup"
+            "Mod Gather",
+            "Mod Gather working",
+            "Mod Gather: dispatching CONSTRUCT",
+            "State transition CREATE_REGISTRIES",
+            "State transition OBJECT_HOLDERS",
+            "State transition LOAD_REGISTRIES",
+            MINECRAFT_PROGRESS
     ).map(String::toLowerCase).collect(Collectors.toSet());
     public static final ProgressMeter NULL_PROGRESS_METER = new ProgressMeter(null, 1, 0, null);
-    private static final Logger LOG = LogManager.getLogger();
 
     private LoadingProgressHelper() {
         throw new AssertionError();
@@ -50,7 +51,6 @@ public class LoadingProgressHelper {
         if (label == null) {
             return false;
         }
-        LOG.info("Found early label: {}", label);
         final String lowerLabel = label.toLowerCase();
         for (String earlyLabel : EARLY_LABELS) {
             if (lowerLabel.startsWith(earlyLabel)) {

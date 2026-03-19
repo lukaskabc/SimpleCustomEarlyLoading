@@ -1,8 +1,8 @@
 package cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.config.condition;
 
 import cz.lukaskabc.minecraft.mod_loader.loading.simple_custom_early_loading.helper.LoadingProgressHelper;
-import net.neoforged.fml.loading.progress.ProgressMeter;
-import net.neoforged.fml.loading.progress.StartupNotificationManager;
+import net.minecraftforge.fml.loading.progress.ProgressMeter;
+import net.minecraftforge.fml.loading.progress.StartupNotificationManager;
 
 import java.util.List;
 
