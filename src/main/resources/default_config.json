@@ -27,16 +27,19 @@
       //     "stages": [
       //       // Note that some stages may occure concurently or in a different order
       //       // some of the options for example are:
+      //       "Discovering mod files",
+      //       "Loaded language provider",
       //       "Scanning mod candidates",
       //       "Launching minecraft",
       //       "Loading bootstrap resources",
       //       "Loading mods",
-      //       "Mod Construction",
-      //       "Mod Construction: Deferred Queue",
-      //       "Registry initialization",
-      //       "Config loading",
+      //       "Mod Gather",
+      //       "Mod Gather working",
+      //       "Mod Gather: dispatching CONSTRUCT",
+      //       "State transition CREATE_REGISTRIES",
+      //       "State transition OBJECT_HOLDERS",
+      //       "State transition LOAD_REGISTRIES",
       //       "Minecraft Progress",
-      //       "Sided setup"
       //     ]
       //   }
       // ],

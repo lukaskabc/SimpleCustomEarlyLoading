@@ -152,7 +152,22 @@ Since version 2.2, it is possible to specify display conditions for each element
       "Registry initialization",
       "Config loading",
       "Minecraft Progress",
-      "Sided setup"
+      "Sided setup",
+      // Note that those stages differ between Forge and NeoForge
+      // Forge stages are below:
+      "Discovering mod files",
+      "Loaded language provider",
+      "Scanning mod candidates",
+      "Launching minecraft",
+      "Loading bootstrap resources",
+      "Loading mods",
+      "Mod Gather",
+      "Mod Gather working",
+      "Mod Gather: dispatching CONSTRUCT",
+      "State transition CREATE_REGISTRIES",
+      "State transition OBJECT_HOLDERS",
+      "State transition LOAD_REGISTRIES",
+      "Minecraft Progress"
     ]
   }
 ],
