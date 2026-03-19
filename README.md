@@ -124,6 +124,9 @@ During export, you need to **uncheck** the "Detect unchanged pixels" option.
 
 Since version 2.2, it is possible to specify display conditions for each element.
 
+- The condition result can be negated with `"negate": true`
+- The condition can also be activated only once and hold forever after that with `"hold_after_trigger": true`
+
 ```json
 "display_conditions": [
     // a list of conditions, when any of the conditions is met, the element will be rendered
