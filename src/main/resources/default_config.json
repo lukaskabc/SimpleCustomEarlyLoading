@@ -10,6 +10,34 @@
       // you can also specify multiple images from which a random one will be picked
       // "image": ["stellarview.png", "another.png", "yet_another.png"],
       "image": "stellarview.png",
+      // "display_conditions": [
+      //   // a list of conditions, when any of the conditions is met, the element will be rendered
+      //   {
+      //     "type": "LOADING_PERCENTAGE", // renders the element when the Minecraft loading progress percentage is in the defined range
+      //     "minimum": 0,
+      //     "minimumInclusive": false,
+      //     "maximum": 50,
+      //     "maximumInclusive": true,
+      //   },
+      //   {
+      //     "type": "LOADING_STAGE", // renders the element when any active loading stage contains any of the defined keywords (stages below)
+      //     // the match is not case sensitive
+      //     "stages": [
+      //       // Note that some stages may occure concurently or in a different order
+      //       // some of the options for example are:
+      //       "Scanning mod candidates",
+      //       "Launching minecraft",
+      //       "Loading bootstrap resources",
+      //       "Loading mods",
+      //       "Mod Construction",
+      //       "Mod Construction: Deferred Queue",
+      //       "Registry initialization",
+      //       "Config loading",
+      //       "Minecraft Progress",
+      //       "Sided setup"
+      //     ]
+      //   }
+      // ],
       "position": {
         // define which point in the image should be aligned at x, y position on the window
         // Possible values: TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, CENTER, TOP_CENTER, BOTTOM_CENTER, LEFT_CENTER, RIGHT_CENTER
@@ -34,6 +62,12 @@
       // the loading text should be centered and poistioned at 60% from the top of the window
       // loading.png is also available if you want the text without animation
       "image": "loading.apng",
+      // APNG texture can also be rendered based on the loading progress
+      // if the APNG texture has 100 frames, each frame will be rendered at each percentage of the loading progress (so frame 50 will be rendered at 50% loading progress)
+      // GAME_LOADING_IMAGE uses minecraft loading progress, note that this progress is AFTER the early loading
+      // TOTAL_LOADING_IMAGE uses heuristic based on known loading phases to estimate the total loading progress,
+      //                     that includes the early loading AND minecraft loading in total
+      // "type": "TOTAL_LOADING_IMAGE" // or "GAME_LOADING_IMAGE"
       "position": {
         // using bottom center alignes the bottom of the loading text to the 60%
         // this comes handy as we want to render the loading bar below it
